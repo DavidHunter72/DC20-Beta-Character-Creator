@@ -4,239 +4,270 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DC20 Beta 0.10 — Character Creator</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/tabler-icons.min.css">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#ffffff;--bg2:#f5f5f0;--bg3:#ececec;
-  --text:#1a1a1a;--text2:#666;--text3:#999;
-  --border:#d0d0d0;--border2:#b0b0b0;
-  --blue:#378ADD;--blue-bg:#E6F1FB;--blue-text:#185FA5;
-  --green:#1D9E75;--green-bg:#E1F5EE;--green-text:#0F6E56;
-  --purple:#7F77DD;--purple-bg:#EEEDFE;--purple-text:#534AB7;
-  --amber-bg:#FAEEDA;--amber-text:#854F0B;
-  --coral-bg:#FAECE7;--coral-text:#993C1D;
-  --radius:8px;--radius-lg:12px;
-  color-scheme:light dark;
+  --bg:#fff;--bg2:#f5f4f0;--bg3:#eceae4;
+  --text:#1a1a1a;--text2:#5a5a5a;--text3:#999;
+  --border:#d0cfc8;--border2:#b0afa8;
+  --blue:#378ADD;--blue-bg:#E6F1FB;--blue-dark:#185FA5;
+  --green:#1D9E75;--green-bg:#E1F5EE;--green-dark:#0F6E56;
+  --purple:#7F77DD;--purple-bg:#EEEDFE;--purple-dark:#534AB7;
+  --amber-bg:#FAEEDA;--amber-dark:#854F0B;
+  --coral-bg:#FAECE7;--coral-dark:#993C1D;
+  --red:#c0392b;
+  --dc-purple:#5c3d8f;--dc-red:#c0392b;--dc-gold:#c9a84c;
+  --r:8px;--rlg:12px;
 }
 @media(prefers-color-scheme:dark){
   :root{
-    --bg:#1e1e1e;--bg2:#2a2a2a;--bg3:#333;
-    --text:#e8e8e8;--text2:#aaa;--text3:#777;
-    --border:#444;--border2:#555;
-    --blue-bg:#0c2540;--blue-text:#7ab8f5;
-    --green-bg:#062a1e;--green-text:#5ecba5;
-    --purple-bg:#1a1840;--purple-text:#a8a2f0;
-    --amber-bg:#2a1e00;--amber-text:#e8b86d;
-    --coral-bg:#2a1008;--coral-text:#f0a080;
+    --bg:#1e1d1a;--bg2:#252420;--bg3:#2e2c28;
+    --text:#e8e6e0;--text2:#a0a098;--text3:#666;
+    --border:#3a3830;--border2:#504e46;
+    --blue-bg:#0c2540;--blue-dark:#7ab8f5;
+    --green-bg:#062a1e;--green-dark:#5ecba5;
+    --purple-bg:#1a1840;--purple-dark:#a8a2f0;
+    --amber-bg:#2a1e00;--amber-dark:#e8b86d;
+    --coral-bg:#2a1008;--coral-dark:#f0a080;
+    --dc-gold:#d4b86a;
   }
 }
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;background:var(--bg3);color:var(--text);min-height:100vh;padding:1rem}
-.app{max-width:700px;margin:0 auto;background:var(--bg);border-radius:var(--radius-lg);border:0.5px solid var(--border);overflow:hidden}
-.header{padding:1.5rem 1.5rem 1rem;border-bottom:1.5px solid var(--border);background:var(--bg2)}
-.header h1{font-size:22px;font-weight:600;letter-spacing:0.5px}
-.header p{font-size:13px;color:var(--text2);margin-top:4px}
-.step-bar-wrap{padding:0 1.5rem;background:var(--bg2);border-bottom:0.5px solid var(--border)}
+.app{max-width:720px;margin:0 auto;background:var(--bg);border-radius:var(--rlg);border:0.5px solid var(--border);overflow:hidden;box-shadow:0 2px 20px rgba(0,0,0,.12)}
+.hdr{padding:1.25rem 1.5rem 1rem;border-bottom:2px solid var(--border);background:var(--bg2);display:flex;align-items:center;gap:12px}
+.hdr-logo{font-size:28px;line-height:1}
+.hdr h1{font-size:20px;font-weight:700;letter-spacing:.3px}
+.hdr p{font-size:12px;color:var(--text2);margin-top:2px}
+.step-wrap{padding:0 1.5rem;background:var(--bg2);border-bottom:0.5px solid var(--border)}
+.step-lbl{font-size:10px;color:var(--text2);padding:6px 0 4px;font-weight:700;text-transform:uppercase;letter-spacing:.6px}
 .step-bar{display:flex;gap:3px;padding-bottom:10px}
-.step-pip{flex:1;height:4px;background:var(--border);border-radius:2px;cursor:pointer;transition:background .2s;min-width:0}
-.step-pip.done{background:var(--green)}
-.step-pip.active{background:var(--blue)}
-.step-label{font-size:11px;color:var(--text2);padding:6px 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.pip{flex:1;height:4px;background:var(--border);border-radius:2px;cursor:pointer;transition:background .2s;min-width:0}
+.pip.done{background:var(--green)}
+.pip.active{background:var(--blue)}
 .content{padding:1.25rem 1.5rem}
 .panel{display:none}.panel.active{display:block}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-@media(max-width:520px){.grid2,.grid3{grid-template-columns:1fr 1fr}.grid3{grid-template-columns:1fr 1fr}}
-.card-pick{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--radius-lg);padding:10px 12px;cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
-.card-pick:hover{border-color:var(--border2)}
-.card-pick.selected{border-color:var(--blue);background:var(--blue-bg)}
-.card-pick .name{font-size:13px;font-weight:600;margin-bottom:2px}
-.card-pick .sub{font-size:11px;color:var(--text2);line-height:1.4}
-.badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;margin-left:4px;vertical-align:middle;font-weight:500}
-.b-paragon{background:var(--coral-bg);color:var(--coral-text)}
-.b-martial{background:var(--green-bg);color:var(--green-text)}
-.b-spell{background:var(--purple-bg);color:var(--purple-text)}
-.b-hybrid{background:var(--amber-bg);color:var(--amber-text)}
-.sec-title{font-size:16px;font-weight:600;margin-bottom:8px}
-.sec-sub{font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.5}
-.attr-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px}
-.attr-name{font-size:14px;font-weight:600;width:100px;flex-shrink:0}
-.attr-desc{font-size:12px;color:var(--text2);flex:1}
-.attr-ctrl{display:flex;align-items:center;gap:6px;flex-shrink:0}
-.attr-ctrl button{width:28px;height:28px;border:0.5px solid var(--border2);background:var(--bg3);border-radius:6px;cursor:pointer;font-size:18px;line-height:1;color:var(--text);transition:background .1s}
-.attr-ctrl button:hover:not(:disabled){background:var(--border)}
-.attr-ctrl button:disabled{opacity:0.3;cursor:not-allowed}
-.attr-val{font-size:16px;font-weight:700;width:32px;text-align:center}
-.points-left{font-size:13px;color:var(--text2);margin-bottom:14px;padding:8px 12px;background:var(--blue-bg);border-radius:var(--radius);color:var(--blue-text)}
-.skill-row{display:flex;align-items:center;gap:8px;margin-bottom:5px;padding:6px 10px;background:var(--bg2);border:0.5px solid var(--border);border-radius:6px}
-.skill-name{font-size:13px;font-weight:500;flex:1}
-.skill-attr{font-size:11px;color:var(--text2);width:80px;flex-shrink:0}
-.skill-ctrl{display:flex;align-items:center;gap:5px;flex-shrink:0}
-.skill-ctrl button{width:22px;height:22px;border:0.5px solid var(--border2);background:var(--bg3);border-radius:4px;cursor:pointer;font-size:14px;color:var(--text)}
-.skill-ctrl button:disabled{opacity:0.3;cursor:not-allowed}
-.skill-val{font-size:13px;font-weight:600;width:22px;text-align:center}
+@media(max-width:500px){.grid2,.grid3{grid-template-columns:1fr 1fr}}
+.cp{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--rlg);padding:10px 12px;cursor:pointer;transition:border-color .15s,background .15s;user-select:none}
+.cp:hover{border-color:var(--border2)}
+.cp.sel{border-color:var(--blue);background:var(--blue-bg)}
+.cp .nm{font-size:13px;font-weight:700;margin-bottom:2px}
+.cp .sb{font-size:11px;color:var(--text2);line-height:1.4}
+.badge{display:inline-block;font-size:10px;padding:1px 6px;border-radius:4px;margin-left:4px;vertical-align:middle;font-weight:600}
+.bm{background:var(--green-bg);color:var(--green-dark)}
+.bs{background:var(--purple-bg);color:var(--purple-dark)}
+.bh{background:var(--amber-bg);color:var(--amber-dark)}
+.bp{background:var(--coral-bg);color:var(--coral-dark)}
+.stit{font-size:16px;font-weight:700;margin-bottom:8px}
+.ssub{font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.5}
+.arow{display:flex;align-items:center;gap:10px;margin-bottom:8px;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:10px 12px}
+.anm{font-size:14px;font-weight:700;width:105px;flex-shrink:0}
+.ads{font-size:12px;color:var(--text2);flex:1}
+.ac{display:flex;align-items:center;gap:6px;flex-shrink:0}
+.ac button{width:28px;height:28px;border:0.5px solid var(--border2);background:var(--bg3);border-radius:6px;cursor:pointer;font-size:18px;line-height:1;color:var(--text)}
+.ac button:hover:not(:disabled){background:var(--border)}
+.ac button:disabled{opacity:.3;cursor:not-allowed}
+.av{font-size:16px;font-weight:800;width:32px;text-align:center}
+.pts{font-size:13px;color:var(--blue-dark);margin-bottom:14px;padding:8px 12px;background:var(--blue-bg);border-radius:var(--r)}
+.skrow{display:flex;align-items:center;gap:8px;margin-bottom:5px;padding:6px 10px;background:var(--bg2);border:0.5px solid var(--border);border-radius:6px}
+.sknm{font-size:13px;font-weight:500;flex:1}
+.skat{font-size:11px;color:var(--text2);width:90px;flex-shrink:0}
+.skc{display:flex;align-items:center;gap:5px;flex-shrink:0}
+.skc button{width:22px;height:22px;border:0.5px solid var(--border2);background:var(--bg3);border-radius:4px;cursor:pointer;font-size:14px;color:var(--text)}
+.skc button:disabled{opacity:.3;cursor:not-allowed}
+.skv{font-size:13px;font-weight:700;width:22px;text-align:center}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--border);display:inline-block;margin:0 1px}
 .dot.on{background:var(--blue)}
 .tabs{display:flex;gap:4px;margin-bottom:10px;flex-wrap:wrap}
 .tab{padding:5px 10px;border:0.5px solid var(--border);border-radius:6px;cursor:pointer;font-size:12px;background:var(--bg2);color:var(--text2);transition:all .15s;user-select:none}
 .tab:hover{border-color:var(--border2)}
-.tab.active{background:var(--blue-bg);border-color:var(--blue);color:var(--blue-text);font-weight:600}
-.spell-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;cursor:pointer;transition:border-color .15s}
-.spell-card:hover{border-color:var(--border2)}
-.spell-card.selected{border-color:var(--purple);background:var(--purple-bg)}
-.spell-card .sname{font-size:13px;font-weight:600}
-.spell-card .smeta{font-size:11px;color:var(--text2);margin-top:2px}
+.tab.active{background:var(--blue-bg);border-color:var(--blue);color:var(--blue-dark);font-weight:700}
+.sc{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:10px;cursor:pointer;transition:border-color .15s}
+.sc:hover{border-color:var(--border2)}
+.sc.sel{border-color:var(--purple);background:var(--purple-bg)}
+.sc .sn{font-size:13px;font-weight:700}
+.sc .sm{font-size:11px;color:var(--text2);margin-top:2px}
 .stag{display:inline-block;font-size:10px;padding:1px 5px;border-radius:3px;background:var(--bg3);color:var(--text2);margin:2px 2px 0 0;border:0.5px solid var(--border)}
-.talent-card{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;cursor:pointer;margin-bottom:6px;transition:border-color .15s,background .15s}
-.talent-card:hover{border-color:var(--border2)}
-.talent-card.selected{border-color:var(--green);background:var(--green-bg)}
-.talent-card .tname{font-size:13px;font-weight:600}
-.talent-card .tdesc{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.4}
-.sheet-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:10px}
-@media(max-width:520px){.sheet-grid{grid-template-columns:1fr 1fr}}
-.stat-box{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius);padding:10px;text-align:center}
-.stat-label{font-size:10px;color:var(--text2);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px;font-weight:600}
-.stat-value{font-size:22px;font-weight:700}
-.stat-sub{font-size:10px;color:var(--text3);margin-top:2px}
-.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:1.25rem;padding-top:1rem;border-top:0.5px solid var(--border)}
-button.back-btn{padding:8px 18px;border-radius:var(--radius);font-size:14px;cursor:pointer;border:0.5px solid var(--border2);background:var(--bg2);color:var(--text);transition:background .1s}
-button.back-btn:hover{background:var(--bg3)}
-button.next-btn{padding:8px 22px;border-radius:var(--radius);font-size:14px;cursor:pointer;border:none;background:var(--blue);color:#fff;font-weight:600;transition:opacity .15s}
-button.next-btn:disabled{opacity:0.35;cursor:not-allowed}
-.info-box{background:var(--blue-bg);border:0.5px solid var(--blue);border-radius:var(--radius);padding:10px 12px;font-size:13px;color:var(--blue-text);margin-bottom:12px}
-.sec-break{border-top:0.5px solid var(--border);margin:14px 0}
-.char-input{width:100%;font-size:15px;padding:9px 12px;border:0.5px solid var(--border2);border-radius:var(--radius);background:var(--bg2);color:var(--text);margin-bottom:10px;transition:border-color .15s}
-.char-input:focus{outline:none;border-color:var(--blue)}
-textarea.char-input{min-height:90px;resize:vertical;font-family:inherit;font-size:13px}
-.subclass-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.sc-card{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--radius);padding:10px 12px;cursor:pointer;transition:border-color .15s,background .15s}
-.sc-card:hover{border-color:var(--border2)}
-.sc-card.selected{border-color:var(--blue);background:var(--blue-bg)}
-.sc-card .sname{font-size:13px;font-weight:600}
-.sc-card .sdesc{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.4}
-.equip-row{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg2);border:0.5px solid var(--border);border-radius:6px;margin-bottom:5px}
-.equip-check{width:16px;height:16px;cursor:pointer;accent-color:var(--blue);flex-shrink:0}
-.equip-label{font-size:13px;font-weight:500;flex:1}
-.equip-sub{font-size:11px;color:var(--text2)}
-.sheet-sec{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--radius-lg);padding:12px 14px;margin-bottom:8px}
-.sheet-sec h3{font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px}
-.sheet-name{font-size:20px;font-weight:700;margin-bottom:3px}
-.sheet-meta{font-size:13px;color:var(--text2)}
-.list-item{font-size:13px;padding:3px 0;border-bottom:0.5px solid var(--border)}
-.list-item:last-child{border-bottom:none}
-.final-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
-.export-btn{width:100%;padding:10px;border-radius:var(--radius);font-size:14px;cursor:pointer;font-weight:600;transition:opacity .15s}
-.export-btn.primary{background:var(--blue);color:#fff;border:none}
-.export-btn.secondary{background:var(--bg2);color:var(--text);border:0.5px solid var(--border2)}
-.export-btn:hover{opacity:0.85}
-.scrollable{max-height:350px;overflow-y:auto;padding-right:2px}
+.tc{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:10px 12px;cursor:pointer;margin-bottom:6px;transition:border-color .15s,background .15s}
+.tc:hover{border-color:var(--border2)}
+.tc.sel{border-color:var(--green);background:var(--green-bg)}
+.tc .tn{font-size:13px;font-weight:700}
+.tc .td{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.4}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-top:1.25rem;padding-top:1rem;border-top:0.5px solid var(--border)}
+.bck{padding:8px 18px;border-radius:var(--r);font-size:14px;cursor:pointer;border:0.5px solid var(--border2);background:var(--bg2);color:var(--text)}
+.nxt{padding:8px 22px;border-radius:var(--r);font-size:14px;cursor:pointer;border:none;background:var(--blue);color:#fff;font-weight:700}
+.nxt:disabled{opacity:.35;cursor:not-allowed}
+.infobox{background:var(--blue-bg);border:0.5px solid var(--blue);border-radius:var(--r);padding:10px 12px;font-size:13px;color:var(--blue-dark);margin-bottom:12px}
+.br{border-top:0.5px solid var(--border);margin:14px 0}
+.inp{width:100%;font-size:15px;padding:9px 12px;border:0.5px solid var(--border2);border-radius:var(--r);background:var(--bg2);color:var(--text);margin-bottom:10px}
+.inp:focus{outline:none;border-color:var(--blue)}
+textarea.inp{min-height:90px;resize:vertical;font-family:inherit;font-size:13px}
+.scgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.scp{background:var(--bg2);border:1.5px solid var(--border);border-radius:var(--r);padding:10px 12px;cursor:pointer;transition:border-color .15s,background .15s}
+.scp:hover{border-color:var(--border2)}
+.scp.sel{border-color:var(--blue);background:var(--blue-bg)}
+.scp .spn{font-size:13px;font-weight:700}
+.scp .spd{font-size:12px;color:var(--text2);margin-top:3px;line-height:1.4}
+.eqrow{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--bg2);border:0.5px solid var(--border);border-radius:6px;margin-bottom:5px}
+.eqck{width:16px;height:16px;cursor:pointer;accent-color:var(--blue);flex-shrink:0}
+.eqlb{font-size:13px;font-weight:500;flex:1}
+.eqsb{font-size:11px;color:var(--text2)}
+.scroll{max-height:360px;overflow-y:auto;padding-right:2px}
 .tip{font-size:11px;color:var(--text3);font-style:italic;margin-top:4px}
-.lbl{font-size:13px;font-weight:600;margin-bottom:6px;margin-top:12px}
-label.lbl{display:block}
-.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#1a1a1a;color:#fff;padding:10px 20px;border-radius:var(--radius-lg);font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
+.lbl{font-size:13px;font-weight:700;margin-bottom:6px;margin-top:12px;display:block}
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%);background:#111;color:#fff;padding:10px 22px;border-radius:20px;font-size:13px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:9999}
 .toast.show{opacity:1}
+/* Level selector */
+.lvl-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:10px 14px}
+.lvl-row label{font-size:14px;font-weight:700;flex:1}
+.lvl-row select{padding:5px 10px;border:0.5px solid var(--border2);border-radius:6px;background:var(--bg);color:var(--text);font-size:14px;font-weight:700}
+/* Sheet stats grid */
+.sh-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+@media(max-width:480px){.sh-grid{grid-template-columns:1fr 1fr}}
+.sh-stat{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--r);padding:8px;text-align:center}
+.sh-lbl{font-size:9px;color:var(--text2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+.sh-val{font-size:20px;font-weight:800}
+.sh-sub{font-size:10px;color:var(--text3);margin-top:1px}
+.sh-sec{background:var(--bg2);border:0.5px solid var(--border);border-radius:var(--rlg);padding:12px 14px;margin-bottom:8px}
+.sh-sec h3{font-size:10px;font-weight:800;color:var(--text2);text-transform:uppercase;letter-spacing:.7px;margin-bottom:8px;padding-bottom:6px;border-bottom:0.5px solid var(--border)}
+.li{font-size:13px;padding:4px 0;border-bottom:0.5px solid var(--border)}
+.li:last-child{border-bottom:none}
+.sh-name{font-size:22px;font-weight:800;margin-bottom:3px}
+.sh-meta{font-size:13px;color:var(--text2)}
+.exp-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.ebtn{width:100%;padding:10px;border-radius:var(--r);font-size:14px;cursor:pointer;font-weight:700;transition:opacity .15s}
+.ebtn.pri{background:var(--blue);color:#fff;border:none}
+.ebtn.sec{background:var(--bg2);color:var(--text);border:0.5px solid var(--border2)}
+.ebtn:hover{opacity:.85}
+/* Progression table */
+.prog-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:8px}
+.prog-table th{text-align:left;padding:5px 8px;border-bottom:2px solid var(--border);font-size:10px;text-transform:uppercase;letter-spacing:.4px;color:var(--text2);font-weight:700}
+.prog-table td{padding:5px 8px;border-bottom:0.5px solid var(--border);vertical-align:middle}
+.prog-table tr.cur td{background:var(--blue-bg);font-weight:700;color:var(--blue-dark)}
+.prog-table .hi{color:var(--green-dark);font-weight:700}
 </style>
 </head>
 <body>
-
 <div class="app">
-  <div class="header">
-    <h1>⚔️ DC20 Beta 0.10 — Character Creator</h1>
-    <p>Build your Level 1 hero step by step · Based on the DC20 Beta 0.10 ruleset by The Dungeon Coach</p>
+  <div class="hdr">
+    <div class="hdr-logo">⚔️</div>
+    <div>
+      <h1>DC20 Beta 0.10 — Character Creator</h1>
+      <p>Build your hero · Levels 1–10 · By The Dungeon Coach</p>
+    </div>
   </div>
-  <div class="step-bar-wrap">
-    <div class="step-label" id="stepLabel"></div>
-    <div class="step-bar" id="stepBar"></div>
+  <div class="step-wrap">
+    <div class="step-lbl" id="sLbl"></div>
+    <div class="step-bar" id="sBar"></div>
   </div>
-  <div class="content">
-    <div id="panels"></div>
-  </div>
+  <div class="content"><div id="panels"></div></div>
 </div>
-
 <div class="toast" id="toast"></div>
-
 <script>
-const STEPS = ["Concept","Ancestry","Class","Attributes","Background","Skills & Trades","Equipment","Spells & Maneuvers","Talents","Character Sheet"];
+const STEPS=["Concept","Ancestry","Class","Attributes","Background","Skills & Trades","Equipment","Spells & Maneuvers","Talents","Level & Progression","Character Sheet"];
 
-const ANCESTRIES = [
-  {id:"human",name:"Human",desc:"Adaptable and driven. Gain an Attribute increase, Skill Expertise, and Human Resolve.",traits:"Attribute +1, Skill Expertise, Human Resolve, Undying (0)"},
-  {id:"elf",name:"Elf",desc:"Agile and perceptive. Resist charm, avoid difficult terrain, full dodge action.",traits:"Elven Will, Nimble, Agile Explorer, Discerning Sight (0)"},
-  {id:"dwarf",name:"Dwarf",desc:"Hardy and stalwart. Resist poison, avoid impairment, and endure through toughness.",traits:"Tough +1 HP, Toxic Fortitude, Physically Sturdy, Iron Stomach (0)"},
-  {id:"halfling",name:"Halfling",desc:"Small but courageous. Resist fear, disengage masterfully, and befriend beasts.",traits:"Small-Sized (−1), Elusive, Halfling Bravery, Halfling Endurance, Deft Footwork"},
-  {id:"gnome",name:"Gnome",desc:"Clever escape artists. Resist grapple and mental effects with sharp perception.",traits:"Small-Sized (−1), Escape Artist, Magnified Vision, Mental Clarity, Strong-Minded"},
-  {id:"orc",name:"Orc",desc:"Fierce and brutal. Rush into combat with temp HP, deal bonus damage on heavy hits.",traits:"Cursed Mind (−1), Orc Rush, Brutal Strikes, Tough +1 HP, Orcish Resolve"},
-  {id:"dragonborn",name:"Dragonborn",desc:"Draconic heritage grants a breath weapon, elemental resistance, and fearsome presence.",traits:"Draconic Origin, Draconic Resistance, Draconic Breath Weapon"},
-  {id:"angelborn",name:"Angelborn",desc:"Celestial lineage. Emit holy light, gain divine clarity, and resist the darkness.",traits:"Divine Glow (0), Celestial Resistance, Angelic Insight, Glide Speed (2)"},
-  {id:"fiendborn",name:"Fiendborn",desc:"Infernal origins. Darkvision, fire or cold resistance, and a fiendish aura of power.",traits:"Fiendish Origin, Fiendish Resistance, Silver-Tongued, Fiendish Aura"},
-  {id:"giantborn",name:"Giantborn",desc:"Towering and powerful. Increase effective size, massive HP, and resist being stunned.",traits:"Tough +1 HP, Powerful Build, Unstoppable, Giant's Resolve, Unyielding Movement (0)"},
-  {id:"goblin",name:"Goblin",desc:"Quick and sneaky. Small size, nimble escape, and surprising combat tricks.",traits:"Small-Sized (−1), Nimble Escape, Goblin Cunning, Darkvision"},
-  {id:"beastkin",name:"Beastkin",desc:"Animalistic traits — natural weapons, keen senses, and beast-like athleticism.",traits:"Natural Weapon, Keen Senses, Animal Form Affinity, Feral Instinct"},
-  {id:"leshy",name:"Leshy",desc:"Plant-like being with natural regeneration, nature affinity, and physical resilience.",traits:"Plant Type, Natural Regen, Entangle Immunity, Nature Bond"}
+// Progression table per level
+const PROG=[
+  {lv:1,cm:1,attrCap:3,skCap:"Novice",attrPts:0,skPts:0,trPts:0,features:"Class Features"},
+  {lv:2,cm:1,attrCap:3,skCap:"Novice",attrPts:0,skPts:0,trPts:0,features:"Class Features, Talent, Path"},
+  {lv:3,cm:2,attrCap:3,skCap:"Novice",attrPts:1,skPts:1,trPts:1,features:"Subclass Features"},
+  {lv:4,cm:2,attrCap:3,skCap:"Novice",attrPts:0,skPts:0,trPts:0,features:"Talent, +2 Ancestry Points, Path"},
+  {lv:5,cm:3,attrCap:4,skCap:"Adept",attrPts:1,skPts:2,trPts:1,features:"Class Features"},
+  {lv:6,cm:3,attrCap:4,skCap:"Adept",attrPts:0,skPts:1,trPts:0,features:"Subclass Features, Path"},
+  {lv:7,cm:4,attrCap:4,skCap:"Adept",attrPts:0,skPts:0,trPts:0,features:"Talent, +2 Ancestry Points"},
+  {lv:8,cm:4,attrCap:4,skCap:"Adept",attrPts:1,skPts:1,trPts:1,features:"Class Capstone, Path"},
+  {lv:9,cm:5,attrCap:4,skCap:"Adept",attrPts:0,skPts:0,trPts:0,features:"Subclass Capstone"},
+  {lv:10,cm:5,attrCap:5,skCap:"Expert",attrPts:1,skPts:2,trPts:1,features:"Epic Boon, Talent"}
 ];
 
-const CLASSES = [
-  {id:"barbarian",name:"Barbarian",type:"martial",hp:10,sp:1,mp:0,desc:"Primal warrior fueled by Rage. Deal bonus damage, gain an elemental aura, and endure through sheer fury.",subclasses:[
-    {id:"elemental",name:"Elemental Fury",desc:"Surround yourself with an elemental aura (fire, cold, lightning, or physical). Allies and enemies feel its power.",paragon:true},
-    {id:"spirit",name:"Spirit Guardian",desc:"Ancestral spirits protect allies with a mystical aura, shoves, and defensive maneuvers from within range.",paragon:false}
+function getLvRow(lv){return PROG[Math.min(lv,10)-1]}
+function getCM(lv){return getLvRow(lv).cm}
+function getTotalAttrPts(lv){return 12+PROG.slice(0,lv).reduce((a,r)=>a+r.attrPts,0)}
+function getTotalSkPts(lv,intel){return (5+intel)+PROG.slice(0,lv).reduce((a,r)=>a+r.skPts,0)}
+function getTotalTrPts(lv){return 3+PROG.slice(0,lv).reduce((a,r)=>a+r.trPts,0)}
+function getAttrCap(lv){return getLvRow(lv).attrCap}
+function getSkCap(lv){const c=getLvRow(lv).skCap;return c==="Novice"?1:c==="Adept"?2:3}
+
+const ANCESTRIES=[
+  {id:"human",name:"Human",desc:"Adaptable and driven. Attribute increase, Skill Expertise, and Human Resolve.",traits:"Attribute +1, Skill Expertise, Human Resolve, Undying (0)"},
+  {id:"elf",name:"Elf",desc:"Agile and perceptive. Resist charm, avoid difficult terrain, full Dodge action.",traits:"Elven Will, Nimble, Agile Explorer, Discerning Sight (0)"},
+  {id:"dwarf",name:"Dwarf",desc:"Hardy and stalwart. Resist poison, avoid impairment, endure through toughness.",traits:"Tough +1 HP, Toxic Fortitude, Physically Sturdy, Iron Stomach (0)"},
+  {id:"halfling",name:"Halfling",desc:"Small but courageous. Resist fear, masterful disengage, beast friendship.",traits:"Small-Sized (−1), Elusive, Halfling Bravery, Halfling Endurance"},
+  {id:"gnome",name:"Gnome",desc:"Clever escape artists. Resist grapple and mental effects, sharp perception.",traits:"Small-Sized (−1), Escape Artist, Magnified Vision, Mental Clarity"},
+  {id:"orc",name:"Orc",desc:"Fierce and brutal. Rush into combat with temp HP, deal bonus damage on heavy hits.",traits:"Cursed Mind (−1), Orc Rush, Brutal Strikes, Tough +1 HP"},
+  {id:"dragonborn",name:"Dragonborn",desc:"Draconic heritage grants breath weapon, elemental resistance, draconic presence.",traits:"Draconic Origin, Draconic Resistance, Draconic Breath Weapon"},
+  {id:"angelborn",name:"Angelborn",desc:"Celestial lineage — holy light, divine clarity, glide speed.",traits:"Divine Glow (0), Celestial Resistance, Angelic Insight, Glide Speed"},
+  {id:"fiendborn",name:"Fiendborn",desc:"Infernal origins — darkvision, elemental resistance, fiendish aura.",traits:"Fiendish Origin, Fiendish Resistance, Silver-Tongued, Fiendish Aura"},
+  {id:"giantborn",name:"Giantborn",desc:"Towering and powerful. Increased effective size, huge HP, resist stun.",traits:"Tough +1 HP, Powerful Build, Unstoppable, Giant's Resolve"},
+  {id:"goblin",name:"Goblin",desc:"Quick and sneaky. Small size, nimble escape, and surprising tricks.",traits:"Small-Sized (−1), Nimble Escape, Goblin Cunning, Darkvision"},
+  {id:"beastkin",name:"Beastkin",desc:"Animalistic traits — natural weapons, keen senses, beast-like athleticism.",traits:"Natural Weapon, Keen Senses, Animal Form Affinity"},
+  {id:"leshy",name:"Leshy",desc:"Plant-like being with regeneration, nature affinity, and physical resilience.",traits:"Plant Type, Natural Regen, Entangle Immunity, Nature Bond"}
+];
+
+const CLASSES=[
+  {id:"barbarian",name:"Barbarian",type:"martial",hp:10,sp:1,mp:0,desc:"Primal warrior fueled by Rage and elemental power.",subclasses:[
+    {id:"elemental",name:"Elemental Fury",desc:"Surround yourself with an elemental aura (fire/cold/lightning/physical) damaging foes around you.",paragon:true},
+    {id:"spirit",name:"Spirit Guardian",desc:"Ancestral spirits protect allies with a mystical 5-Space aura and defensive maneuvers.",paragon:false}
   ]},
-  {id:"bard",name:"Bard",type:"spell",hp:6,sp:0,mp:6,desc:"Artistic spellcaster inspiring allies through performance, manipulating minds, and casting with Musical or Visual magic.",subclasses:[
-    {id:"eloquence",name:"Eloquence",desc:"Master of charm — enthrall foes, redirect attacks against you, and punish Charmed targets who snap out of it.",paragon:true},
-    {id:"jester",name:"Jester",desc:"Antagonize and distract enemies. Turn enemy failures into ally advantages through pratfalls and heckling.",paragon:false}
+  {id:"bard",name:"Bard",type:"spell",hp:6,sp:0,mp:6,desc:"Artistic spellcaster inspiring allies through magical performance.",subclasses:[
+    {id:"eloquence",name:"Eloquence",desc:"Master charm and deception — redirect attacks and punish Charmed targets.",paragon:true},
+    {id:"jester",name:"Jester",desc:"Antagonize and distract enemies, turning their failures to your allies' advantage.",paragon:false}
   ]},
-  {id:"champion",name:"Champion",type:"martial",hp:9,sp:1,mp:0,desc:"Versatile martial hero with Tactical Dice, Adaptive Tactics, and Second Wind. Master of combat styles.",subclasses:[
-    {id:"hero",name:"Hero",desc:"Adrenaline Boost on Second Wind, cut through Physical Resistances, and stay Unyielding even while Bloodied.",paragon:true},
-    {id:"sentinel",name:"Sentinel",desc:"Steadfast protector using Deflect on any ally in melee range. Defensive Bash punishes close attackers.",paragon:false}
+  {id:"champion",name:"Champion",type:"martial",hp:9,sp:1,mp:0,desc:"Versatile martial hero with Tactical Dice and Combat Styles.",subclasses:[
+    {id:"hero",name:"Hero",desc:"Adrenaline Boost on Second Wind, cut through Physical Resistances, Unyielding spirit.",paragon:true},
+    {id:"sentinel",name:"Sentinel",desc:"Steadfast protector — Deflect any attack on allies in your Melee Range.",paragon:false}
   ]},
-  {id:"cleric",name:"Cleric",type:"spell",hp:7,sp:0,mp:6,desc:"Divine spellcaster channeling deity power through a Cleric Order, Channel Divinity, and powerful Blessings.",subclasses:[
-    {id:"inquisitor",name:"Inquisitor",desc:"Hunt heretics with iron resolve, branded enemies, and divine interrogation. Rebuke Heretics persists through damage.",paragon:true},
-    {id:"priest",name:"Priest",desc:"Devoted healer converting excess healing to Temp HP and magically pulling allies from incoming attacks.",paragon:false}
+  {id:"cleric",name:"Cleric",type:"spell",hp:7,sp:0,mp:6,desc:"Divine spellcaster channeling deity power through Cleric Orders.",subclasses:[
+    {id:"inquisitor",name:"Inquisitor",desc:"Hunt heretics with iron resolve, brands that persist through damage.",paragon:true},
+    {id:"priest",name:"Priest",desc:"Devoted healer converting excess healing to Temp HP, saving allies from death.",paragon:false}
   ]},
-  {id:"commander",name:"Commander",type:"martial",hp:8,sp:1,mp:0,desc:"Battlefield leader inspiring allies through a Commanding Aura and Commander's Call tactical commands.",subclasses:[
-    {id:"crusader",name:"Crusader",desc:"Aura of Courage, Protective Orders on each Commander's Call, and restoring bloodied allies with Rally.",paragon:true},
-    {id:"warlord",name:"Warlord",desc:"Offensive Tactics: Morale Breaker on free Intimidate, +1 flanking damage, and Priority Target aura option.",paragon:false}
+  {id:"commander",name:"Commander",type:"martial",hp:8,sp:1,mp:0,desc:"Battlefield leader inspiring allies through a Commanding Aura.",subclasses:[
+    {id:"crusader",name:"Crusader",desc:"Aura of Courage, Protective Orders on every Commander's Call.",paragon:true},
+    {id:"warlord",name:"Warlord",desc:"Offensive Tactics — Morale Breaker, flanking bonuses, Priority Target.",paragon:false}
   ]},
-  {id:"druid",name:"Druid",type:"spell",hp:7,sp:0,mp:6,desc:"Primal shapeshifter using Wild Form to become beasts and casting nature magic in a Druid Domain.",subclasses:[
-    {id:"phoenix",name:"Phoenix",desc:"Wield fire to destroy and cleanse. Transform into Fire Elementals. Rolling Wild Fire scorches movement.",paragon:true},
-    {id:"rampant",name:"Rampant Growth",desc:"Overgrowth as Plant creatures, Vineguard cover for allies, and Thorny Grasp on failed saves.",paragon:false}
+  {id:"druid",name:"Druid",type:"spell",hp:7,sp:0,mp:6,desc:"Primal shapeshifter using Wild Form and nature magic.",subclasses:[
+    {id:"phoenix",name:"Phoenix",desc:"Wield fire to destroy and cleanse. Transform into Fire Elementals.",paragon:true},
+    {id:"rampant",name:"Rampant Growth",desc:"Overgrowth as Plant creatures, Vineguard cover, Thorny Grasp on failed saves.",paragon:false}
   ]},
-  {id:"hunter",name:"Hunter",type:"martial",hp:8,sp:1,mp:0,desc:"Expert survivalist marking prey, setting traps, and exploiting Favored Terrain and Hunter's Mark.",subclasses:[
-    {id:"slayer",name:"Monster Slayer",desc:"Hunt with Concoctions crafted from monsters — Elemental Infusion, Deathweed, and Plant Fibers.",paragon:true},
-    {id:"tumor",name:"Aberrant Tumor",desc:"Psychic Hunter's Mark with ADV on Analyze Creature. Unreadable mind and Psychic Resistance (1).",paragon:false}
+  {id:"hunter",name:"Hunter",type:"martial",hp:8,sp:1,mp:0,desc:"Expert survivalist marking prey and exploiting Favored Terrain.",subclasses:[
+    {id:"slayer",name:"Monster Slayer",desc:"Hunt with alchemical Concoctions crafted from monster weaknesses.",paragon:true},
+    {id:"tumor",name:"Aberrant Tumor",desc:"Psychic Hunter's Mark, unreadable mind, and Psychic Resistance (1).",paragon:false}
   ]},
-  {id:"monk",name:"Monk",type:"martial",hp:8,sp:1,mp:0,desc:"Disciplined martial artist mastering Monk Stances, Ki Points, and devastating Unarmed Strikes.",subclasses:[
-    {id:"astral",name:"Astral Self",desc:"Manifest astral arms dealing your chosen Mystical damage and deflect Ranged Attacks within 2 Spaces.",paragon:true},
-    {id:"tide",name:"Shifting Tide",desc:"Ebb and Flow between offensive and defensive stances, adapting fluidly to any combat situation.",paragon:false}
+  {id:"monk",name:"Monk",type:"martial",hp:8,sp:1,mp:0,desc:"Disciplined martial artist mastering Stances and Ki Points.",subclasses:[
+    {id:"astral",name:"Astral Self",desc:"Manifest astral arms dealing Mystical damage, deflect Ranged Attacks within 2 Spaces.",paragon:true},
+    {id:"tide",name:"Shifting Tide",desc:"Ebb and Flow between offensive and defensive stances fluidly.",paragon:false}
   ]},
-  {id:"rogue",name:"Rogue",type:"martial",hp:7,sp:1,mp:0,desc:"Cunning striker dealing Debilitating Strikes, Cheap Shots, and evading with Cunning Action.",subclasses:[
-    {id:"death",name:"Long Death",desc:"Thousand Cuts — Bleeding wounds even on immune creatures. The DC can't be ended by regaining HP.",paragon:true},
-    {id:"swash",name:"Swashbuckler",desc:"Renegade Duelist with Riposte, Taunting Shot, and Flourishes expanding your Cunning Action.",paragon:false}
+  {id:"rogue",name:"Rogue",type:"martial",hp:7,sp:1,mp:0,desc:"Cunning striker with Debilitating Strikes and Cunning Action.",subclasses:[
+    {id:"death",name:"Long Death",desc:"Thousand Cuts — Bleeding on immune creatures, ends only by save not HP.",paragon:true},
+    {id:"swash",name:"Swashbuckler",desc:"Renegade Duelist — Riposte, Taunting Shot, expanded Cunning Action.",paragon:false}
   ]},
-  {id:"sorcerer",name:"Sorcerer",type:"spell",hp:6,sp:0,mp:6,desc:"Natural-born spellcaster unleashing innate power with Meta Magic options and chaotic Overload.",subclasses:[
-    {id:"angelic",name:"Angelic",desc:"Celestial Spark — emit radiant light, Careful Spell for free, and burst of healing/radiant damage while Overloaded.",paragon:true},
-    {id:"draconic",name:"Draconic",desc:"Draconic bloodline — scales, elemental affinity, Language Mastery in Draconic, and enhanced breath weapon.",paragon:false}
+  {id:"sorcerer",name:"Sorcerer",type:"spell",hp:6,sp:0,mp:6,desc:"Natural-born spellcaster with Meta Magic and Overload.",subclasses:[
+    {id:"angelic",name:"Angelic",desc:"Celestial Spark — radiant burst of healing/damage while Overloaded.",paragon:true},
+    {id:"draconic",name:"Draconic",desc:"Draconic bloodline — scales, elemental affinity, enhanced breath.",paragon:false}
   ]},
-  {id:"spellblade",name:"Spellblade",type:"hybrid",hp:7,sp:1,mp:2,desc:"Hybrid warrior binding spells to weapons via Spellstrike and mastering combat through Spellblade Disciplines.",subclasses:[
-    {id:"paladin",name:"Paladin",desc:"Holy Warrior — Aura of Protection, Divine Strike (Radiant/Umbral), and Lay on Hands via Acolyte Discipline.",paragon:true},
-    {id:"rune",name:"Rune Knight",desc:"Inscribe powerful magical runes on your Bound Weapon to unleash devastating runic effects in combat.",paragon:false}
+  {id:"spellblade",name:"Spellblade",type:"hybrid",hp:7,sp:1,mp:2,desc:"Hybrid warrior binding spells to weapons via Spellstrike.",subclasses:[
+    {id:"paladin",name:"Paladin",desc:"Holy Warrior — Aura of Protection, Divine Strike, Lay on Hands.",paragon:true},
+    {id:"rune",name:"Rune Knight",desc:"Inscribe powerful magical runes on your Bound Weapon.",paragon:false}
   ]},
-  {id:"warlock",name:"Warlock",type:"spell",hp:6,sp:0,mp:6,desc:"Pact-bound spellcaster wielding eldritch power through dark Warlock Contracts and Pact Boons.",subclasses:[
-    {id:"eldritch",name:"Eldritch",desc:"Otherworldly psychic spells and Forbidden Knowledge from your patron. Temporary Spell after each rest.",paragon:true},
-    {id:"fey",name:"Fey",desc:"Fey Aspect Condition, Fey Step teleport on being Hit, and Beguiling Bargain to charm targets.",paragon:false}
+  {id:"warlock",name:"Warlock",type:"spell",hp:6,sp:0,mp:6,desc:"Pact-bound spellcaster wielding eldritch power through dark Contracts.",subclasses:[
+    {id:"eldritch",name:"Eldritch",desc:"Otherworldly psychic gifts and Forbidden Knowledge from your patron.",paragon:true},
+    {id:"fey",name:"Fey",desc:"Fey Aspect Condition, Fey Step on being Hit, Beguiling Bargain.",paragon:false}
   ]},
-  {id:"wizard",name:"Wizard",type:"spell",hp:6,sp:0,mp:6,desc:"Scholarly spellcaster mastering Arcane Sigils across all Spell Schools methodically and precisely.",subclasses:[
-    {id:"portal",name:"Portal Mage",desc:"Connect Arcane Sigils as two-way portals. Cast spells through them. Gain all Teleportation Spell Tag spells.",paragon:true},
-    {id:"witch",name:"Witch",desc:"Coven's Gift — Curse Spell Tag access. Hex Enhancements: Bewitching, Reaping, or Vermin Hex on any spell.",paragon:false}
+  {id:"wizard",name:"Wizard",type:"spell",hp:6,sp:0,mp:6,desc:"Scholarly spellcaster mastering Arcane Sigils across all schools.",subclasses:[
+    {id:"portal",name:"Portal Mage",desc:"Connect Arcane Sigils as two-way portals. Cast through them.",paragon:true},
+    {id:"witch",name:"Witch",desc:"Coven's Gift — Curse tags, Bewitching/Reaping/Vermin Hex enhancements.",paragon:false}
   ]}
 ];
 
-const ATTRIBUTES = [
-  {id:"might",name:"Might",desc:"Physical power • HP bonus • Area Defense"},
-  {id:"agility",name:"Agility",desc:"Speed • Jump distance • Precision Defense"},
-  {id:"charisma",name:"Charisma",desc:"Social influence • Grit Points • Area Defense"},
-  {id:"intelligence",name:"Intelligence",desc:"Skill points • Precision Defense • Knowledge"}
+const ATTRS=[
+  {id:"might",name:"Might",desc:"Physical power · HP bonus · Area Defense"},
+  {id:"agility",name:"Agility",desc:"Speed · Jump distance · Precision Defense"},
+  {id:"charisma",name:"Charisma",desc:"Social influence · Grit Points · Area Defense"},
+  {id:"intelligence",name:"Intelligence",desc:"Skill points · Precision Defense · Knowledge"}
 ];
 
-const SKILLS = [
+const SKILLS=[
   {id:"athletics",name:"Athletics",attr:"Might"},{id:"intimidation",name:"Intimidation",attr:"Might"},
   {id:"acrobatics",name:"Acrobatics",attr:"Agility"},{id:"stealth",name:"Stealth",attr:"Agility"},
   {id:"trickery",name:"Trickery",attr:"Agility"},{id:"animal",name:"Animal Handling",attr:"Charisma"},
@@ -247,115 +278,99 @@ const SKILLS = [
   {id:"religion",name:"Religion",attr:"Intelligence"},{id:"survival",name:"Survival",attr:"Intelligence"}
 ];
 
-const TRADES = [
+const TRADES=[
   {id:"blacksmith",name:"Blacksmith"},{id:"jeweler",name:"Jeweler"},{id:"leatherworker",name:"Leatherworker"},
   {id:"tinkerer",name:"Tinkerer"},{id:"alchemy",name:"Alchemy"},{id:"cooking",name:"Cooking"},
   {id:"herbalism",name:"Herbalism"},{id:"cartography",name:"Cartography"}
 ];
 
-const SPELLS = [
-  {id:"arcbolt",name:"Arcane Bolt",src:"Arcane",school:"Astromancy",cost:"1 AP",range:"10 Spaces",desc:"Homing bolt of pure magic. Ranged Spell Attack vs AD. Enhancement: Arcane Missiles targets multiple foes."},
-  {id:"arcwave",name:"Arcane Wave",src:"Arcane",school:"Astromancy",cost:"2 AP",range:"Self",desc:"2-Space Cone of destructive energy. Area Spell Attack vs AD. Enhancement: Reverberate to push targets."},
-  {id:"banish",name:"Banish",src:"Arcane/Divine",school:"Astromancy",cost:"1 AP+2 MP",range:"10 Spaces",desc:"Sever target's link to this plane. Repeated Charisma Save. Incapacitated for 1 minute in a demiplane."},
-  {id:"fly",name:"Fly",src:"Arcane",school:"Astromancy",cost:"1 AP+1 MP",range:"Self",desc:"Gain a Fly Speed equal to your Move Speed for 1 minute (Sustained). Fall slowly if concentration breaks."},
-  {id:"haste",name:"Haste",src:"Arcane",school:"Astromancy",cost:"1 AP+2 MP",range:"5 Spaces",desc:"Target gains +1 AP and +2 Speed for 1 minute (Sustained). Enhancement: affect additional targets."},
-  {id:"slowtime",name:"Slow Time",src:"Arcane",school:"Astromancy",cost:"2 AP+2 MP",range:"10 Spaces",desc:"3-Space Sphere of slowed time. Creatures inside are Slowed 2. Spells entering lose range."},
-  {id:"teleport",name:"Teleport",src:"Arcane",school:"Astromancy",cost:"1 AP+3 MP",range:"Self",desc:"Teleport up to 10 Spaces. DC 15 Spell Check. Enhancement: extend range or bring additional creatures."},
-  {id:"telekin",name:"Telekinesis",src:"Arcane",school:"Astromancy",cost:"1 AP+1 MP",range:"10 Spaces",desc:"Manipulate a target with telekinetic force. Move objects or creatures, attack or restrain from range."},
-  {id:"firebolt",name:"Fire Bolt",src:"Arcane/Primal",school:"Elemental",cost:"1 AP",range:"10 Spaces",desc:"Ranged Spell Attack vs PD. Hit: 1 Fire damage. Enhancement: Living Bomb makes it bounce on Heavy Hit."},
-  {id:"fireball",name:"Fireball",src:"Arcane/Primal",school:"Elemental",cost:"2 AP+2 MP",range:"10 Spaces",desc:"Massive explosion in 3-Space Sphere. Area Spell Attack vs PD. Enhancement: increase area or damage."},
-  {id:"frostbolt",name:"Frost Bolt",src:"Arcane/Primal",school:"Elemental",cost:"1 AP",range:"10 Spaces",desc:"Ranged Spell Attack. Hit: 1 Cold damage. Heavy Hit: target Slowed. Enhancement: Freeze (Restrained)."},
-  {id:"lightbolt",name:"Lightning Bolt",src:"Arcane/Primal",school:"Elemental",cost:"2 AP+1 MP",range:"Self",desc:"Line of lightning — Area Spell Attack, Lightning damage. Enhancement: bounce to additional targets."},
-  {id:"conecold",name:"Cone of Cold",src:"Arcane/Primal",school:"Elemental",cost:"2 AP+2 MP",range:"Self",desc:"5-Space Cone of freezing air. Area Spell Attack, Cold damage. Enhancement: larger cone or Freeze."},
-  {id:"firesto",name:"Frost Storm",src:"Arcane/Primal",school:"Elemental",cost:"3 AP+3 MP",range:"10 Spaces",desc:"Massive blizzard in a 4-Space Sphere for 1 minute. Cold damage + Difficult Terrain. (Sustained)"},
-  {id:"charm",name:"Charm",src:"Arcane/Divine",school:"Enchantment",cost:"1 AP+1 MP",range:"10 Spaces",desc:"Repeated Charisma Save. Success: target Charmed for 1 minute. Doesn't end from damage (base)."},
-  {id:"command",name:"Command",src:"Arcane",school:"Enchantment",cost:"1 AP+1 MP",range:"10 Spaces",desc:"Charisma Save. Failure: target must follow a single word command (flee, drop, grovel, etc.) on its turn."},
-  {id:"fear",name:"Fear",src:"Arcane/Divine",school:"Enchantment",cost:"1 AP+1 MP",range:"Self",desc:"2-Space Cone. Charisma Save. Failure: target Frightened for 1 minute. Enhancement: expand the cone."},
-  {id:"hex",name:"Hex",src:"Arcane/Divine",school:"Enchantment",cost:"1 AP+1 MP",range:"10 Spaces",desc:"Mark target. Your Attacks deal +1 damage against it. Enhancement: add Conditions or extend duration."},
-  {id:"slumber",name:"Slumber",src:"Arcane",school:"Enchantment",cost:"1 AP+2 MP",range:"10 Spaces",desc:"Charisma Save. Failure: target Unconscious for 1 minute. Ends if the target takes damage."},
-  {id:"heal",name:"Heal",src:"Divine",school:"Invocation",cost:"1 AP+1 MP",range:"5 Spaces",desc:"Restore HP equal to your Spell Check result to a target within range. Enhancement: mass or greater heal."},
-  {id:"closewnd",name:"Close Wound",src:"Arcane/Divine/Primal",school:"Invocation",cost:"1 AP",range:"1 Space",desc:"Stabilize a dying creature or restore 1 HP. Enhancement: spend MP to restore more HP."},
-  {id:"light",name:"Light",src:"Arcane/Divine/Primal",school:"Invocation",cost:"1 AP",range:"1 Space",desc:"Object sheds Bright Light in 5-Space Radius for 1 hour. Enhancement: Blinding Flash as a reaction."},
-  {id:"death",name:"Death",src:"Arcane/Divine",school:"Nullification",cost:"1 AP+4 MP",range:"10 Spaces",desc:"Physical Save. Failure: target reduced to 0 HP. Success: takes 4 damage. Enhancement: affect multiple."},
-  {id:"invisibl",name:"Invisibility",src:"Arcane/Divine",school:"Transmutation",cost:"1 AP+2 MP",range:"Self",desc:"Become Invisible for 1 minute. Ends early if you Attack or cast an offensive Spell. Enhancement: others."}
+const SPELLS=[
+  {id:"arcbolt",name:"Arcane Bolt",src:"Arcane",school:"Astromancy",cost:"1 AP",range:"10 Spaces",desc:"Homing bolt of pure magic. Ranged Spell Attack vs AD. Enhancement: Arcane Missiles."},
+  {id:"arcwave",name:"Arcane Wave",src:"Arcane",school:"Astromancy",cost:"2 AP",range:"Self",desc:"2-Space Cone of destructive energy. Area Spell Attack vs AD."},
+  {id:"banish",name:"Banish",src:"Arcane/Divine",school:"Astromancy",cost:"1 AP+2 MP",range:"10 Spaces",desc:"Sever target's link to this plane. Repeated Charisma Save. Incapacitated 1 min."},
+  {id:"fly",name:"Fly",src:"Arcane",school:"Astromancy",cost:"1 AP+1 MP",range:"Self",desc:"Fly Speed equal to Move Speed for 1 minute (Sustained)."},
+  {id:"haste",name:"Haste",src:"Arcane",school:"Astromancy",cost:"1 AP+2 MP",range:"5 Spaces",desc:"Target gains +1 AP and +2 Speed for 1 minute (Sustained)."},
+  {id:"slowtime",name:"Slow Time",src:"Arcane",school:"Astromancy",cost:"2 AP+2 MP",range:"10 Spaces",desc:"3-Space Sphere of slowed time. Creatures inside are Slowed 2."},
+  {id:"teleport",name:"Teleport",src:"Arcane",school:"Astromancy",cost:"1 AP+3 MP",range:"Self",desc:"Teleport up to 10 Spaces. DC 15 Spell Check."},
+  {id:"telekin",name:"Telekinesis",src:"Arcane",school:"Astromancy",cost:"1 AP+1 MP",range:"10 Spaces",desc:"Manipulate target with telekinetic force. Move objects or creatures from range."},
+  {id:"firebolt",name:"Fire Bolt",src:"Arcane/Primal",school:"Elemental",cost:"1 AP",range:"10 Spaces",desc:"Ranged Spell Attack vs PD. Hit: 1 Fire damage."},
+  {id:"fireball",name:"Fireball",src:"Arcane/Primal",school:"Elemental",cost:"2 AP+2 MP",range:"10 Spaces",desc:"Explosion in 3-Space Sphere. Area Spell Attack vs PD. Fire damage."},
+  {id:"frostbolt",name:"Frost Bolt",src:"Arcane/Primal",school:"Elemental",cost:"1 AP",range:"10 Spaces",desc:"Ranged Spell Attack. Hit: 1 Cold damage. Heavy Hit: Slowed."},
+  {id:"lightbolt",name:"Lightning Bolt",src:"Arcane/Primal",school:"Elemental",cost:"2 AP+1 MP",range:"Self",desc:"Line of lightning. Area Spell Attack, Lightning damage."},
+  {id:"conecold",name:"Cone of Cold",src:"Arcane/Primal",school:"Elemental",cost:"2 AP+2 MP",range:"Self",desc:"5-Space Cone of freezing air. Area Spell Attack, Cold damage."},
+  {id:"froststorm",name:"Frost Storm",src:"Arcane/Primal",school:"Elemental",cost:"3 AP+3 MP",range:"10 Spaces",desc:"Massive blizzard in 4-Space Sphere for 1 minute (Sustained)."},
+  {id:"charm",name:"Charm",src:"Arcane/Divine",school:"Enchantment",cost:"1 AP+1 MP",range:"10 Spaces",desc:"Repeated Charisma Save. Success: target Charmed for 1 minute."},
+  {id:"command",name:"Command",src:"Arcane",school:"Enchantment",cost:"1 AP+1 MP",range:"10 Spaces",desc:"Charisma Save. Failure: target follows one word command on its turn."},
+  {id:"fear",name:"Fear",src:"Arcane/Divine",school:"Enchantment",cost:"1 AP+1 MP",range:"Self",desc:"2-Space Cone. Charisma Save. Failure: target Frightened for 1 minute."},
+  {id:"hex",name:"Hex",src:"Arcane/Divine",school:"Enchantment",cost:"1 AP+1 MP",range:"10 Spaces",desc:"Mark target. Your Attacks deal +1 damage against it."},
+  {id:"slumber",name:"Slumber",src:"Arcane",school:"Enchantment",cost:"1 AP+2 MP",range:"10 Spaces",desc:"Charisma Save. Failure: target Unconscious for 1 minute."},
+  {id:"heal",name:"Heal",src:"Divine",school:"Invocation",cost:"1 AP+1 MP",range:"5 Spaces",desc:"Restore HP equal to your Spell Check result to a target."},
+  {id:"closewnd",name:"Close Wound",src:"Arcane/Divine/Primal",school:"Invocation",cost:"1 AP",range:"1 Space",desc:"Stabilize a dying creature or restore 1 HP."},
+  {id:"light",name:"Light",src:"Arcane/Divine/Primal",school:"Invocation",cost:"1 AP",range:"1 Space",desc:"Object sheds Bright Light in 5-Space Radius for 1 hour."},
+  {id:"death",name:"Death",src:"Arcane/Divine",school:"Nullification",cost:"1 AP+4 MP",range:"10 Spaces",desc:"Physical Save. Failure: target reduced to 0 HP. Success: 4 damage."},
+  {id:"invisibl",name:"Invisibility",src:"Arcane/Divine",school:"Transmutation",cost:"1 AP+2 MP",range:"Self",desc:"Become Invisible for 1 minute. Ends if you Attack or cast offensively."}
 ];
 
-const MANEUVERS = [
-  {id:"cleave",name:"Cleave",type:"Attack",cost:"1 AP + 1 SP",desc:"Swing wide — Area Martial Attack vs AD of every creature within your melee reach."},
-  {id:"meteor",name:"Meteor Strike",type:"Attack",cost:"1 AP + 1 SP",desc:"Mid-air strike — Jump Distance +2, leap up and smash down. Slam Down Enhancement knocks prone."},
-  {id:"whirlwind",name:"Whirlwind",type:"Attack",cost:"2 AP + 1 SP",desc:"Attack all creatures within 1 Space Aura in a spinning circle. Enhancement: expand the aura."},
-  {id:"powatk",name:"Power Attack",type:"Attack",cost:"1 AP + 1 SP",desc:"Trade accuracy for power. Your next Attack this turn deals +2 damage on a Hit."},
-  {id:"disengage",name:"Heroic Disengage",type:"Defense",cost:"1 AP (Disengage)",desc:"Enhanced disengage — Spend 1 SP to move up to Speed without provoking Opportunity Attacks."},
-  {id:"protect",name:"Protect",type:"Defense",cost:"Reaction",desc:"Take damage for a nearby ally. Reduce it by your Physical Damage Reduction. Heroic: become the target."},
-  {id:"endure",name:"Endure",type:"Defense",cost:"Reaction",desc:"Push through an Attack — take 1 less damage. Heroic: (1 SP, Repeatable) reduce by 1 more each time."},
-  {id:"resolve",name:"Resolve",type:"Defense",cost:"1 AP",desc:"Catch your breath. Gain ADV on Physical Saves or Checks until the start of your next turn."},
-  {id:"brace",name:"Brace",type:"Grapple",cost:"Reaction",desc:"React to a creature being forcibly moved. Set yourself as an anchor to prevent or reduce their movement."},
-  {id:"tackle",name:"Tackle",type:"Grapple",cost:"1 AP + 1 SP",desc:"Attempt to Tackle a creature your Size or smaller — Grapple and knock Prone simultaneously."},
-  {id:"recover",name:"Recover",type:"Utility",cost:"1 AP",desc:"Spend Rest Points to regain HP. DC 15 Martial Check. Success: spend up to 3 Rest Points. +1 per 5 over."},
-  {id:"reposition",name:"Reposition",type:"Utility",cost:"1 AP + 1 SP",desc:"Sprint up to 2x Speed ignoring Difficult Terrain (DC 15 Martial Check). Can be used as a Reaction."}
+const MANEUVERS=[
+  {id:"cleave",name:"Cleave",type:"Attack",cost:"1 AP+1 SP",desc:"Swing wide — Area Martial Attack vs AD of every creature within melee reach."},
+  {id:"meteor",name:"Meteor Strike",type:"Attack",cost:"1 AP+1 SP",desc:"Mid-air strike — Jump Distance +2, leap and smash down. Slam Down knocks prone."},
+  {id:"whirlwind",name:"Whirlwind",type:"Attack",cost:"2 AP+1 SP",desc:"Attack all creatures within 1 Space in a spinning circle."},
+  {id:"powatk",name:"Power Attack",type:"Attack",cost:"1 AP+1 SP",desc:"Trade accuracy for power. Next Attack deals +2 damage on a Hit."},
+  {id:"disengage",name:"Heroic Disengage",type:"Defense",cost:"1 AP",desc:"Enhanced disengage — spend 1 SP to move up to Speed without provoking OAs."},
+  {id:"protect",name:"Protect",type:"Defense",cost:"Reaction",desc:"Take damage for a nearby ally. Heroic: become the target of the Attack."},
+  {id:"endure",name:"Endure",type:"Defense",cost:"Reaction",desc:"Push through an Attack — take 1 less damage. Heroic (1 SP): reduce by 1 more."},
+  {id:"resolve",name:"Resolve",type:"Defense",cost:"1 AP",desc:"Catch your breath. Gain ADV on Physical Saves or Checks."},
+  {id:"brace",name:"Brace",type:"Grapple",cost:"Reaction",desc:"React to a creature being forcibly moved. Set yourself as an anchor."},
+  {id:"tackle",name:"Tackle",type:"Grapple",cost:"1 AP+1 SP",desc:"Grapple and knock Prone a creature your Size or smaller simultaneously."},
+  {id:"recover",name:"Recover",type:"Utility",cost:"1 AP",desc:"Spend Rest Points to regain HP. DC 15 Martial Check. Success: up to 3 Rest Points."},
+  {id:"reposition",name:"Reposition",type:"Utility",cost:"1 AP+1 SP",desc:"Sprint up to 2× Speed ignoring Difficult Terrain (DC 15 Martial Check)."}
 ];
 
-const TALENTS = [
-  // General
-  {id:"ancestryinc",name:"Ancestry Increase",type:"General",desc:"Gain 4 Ancestry Points to spend on Ancestry Traits from your chosen Ancestries."},
-  {id:"attrinc",name:"Attribute Increase",type:"General",desc:"Gain 2 Attribute Points to put into any Attribute of your choice (up to Attribute Limit)."},
-  {id:"skillinc",name:"Skill Increase",type:"General",desc:"Gain 4 Skill Points. Can convert to Trade Points (1 Skill → 2 Trade) or Language Points."},
-  {id:"tough",name:"Tough",type:"General",desc:"Your HP maximum increases by 2. You gain +1 Rest Points. Can be taken multiple times."},
-  {id:"alert",name:"Alert",type:"General",desc:"You cannot be Surprised. Gain +2 bonus to Initiative Checks."},
-  {id:"lucky",name:"Lucky",type:"General",desc:"Once per Long Rest, reroll any Check or Save you make and choose either result."},
-  {id:"martial_exp",name:"Martial Expansion",type:"General",desc:"Gain Combat Training with Weapons, Heavy Armor, all Shields. Learn 2 Maneuvers. Gain Stamina Regen."},
-  {id:"spell_exp",name:"Spellcasting Expansion",type:"General",desc:"Gain Combat Training with Spell Focuses. Add 1 Spell Source or 3 Schools. Learn 3 Spells."},
-  // Barbarian
-  {id:"barb_unfath",name:"Unfathomable Strength",type:"Barbarian",desc:"Req: Rage, Lv3. Titan Grip: wield Two-Handed Weapons one-handed while Raging. Jump Distance +1."},
-  {id:"barb_swift",name:"Swift Berserker",type:"Barbarian",desc:"Req: Rage, Berserker, Lv3. Enter Rage free on Initiative. Charge ignores Difficult Terrain & OAs."},
-  // Bard
-  {id:"bard_expand",name:"Expanded Repertoire",type:"Bard",desc:"Req: Remarkable Repertoire, Lv3. Gain once. +2 Skill Points, learn 2 Spells (any list), gain dual Manner."},
-  {id:"bard_help",name:"Helping Hands",type:"Bard",desc:"Req: Font of Inspiration, Lv3. Help Action grants bonus d8 Help Die to a second creature too."},
-  // Champion
-  {id:"champ_res",name:"Champion's Resolve",type:"Champion",desc:"Req: Adaptive Tactics, Lv3. Tactical Die Assault: +1 damage. Deflect: attacker takes 1 damage on miss."},
-  {id:"champ_disc",name:"Disciplined Combatant",type:"Champion",desc:"Req: Fighting Spirit, Lv3. Spend 2 SP for Combat Readiness once/turn. Use Second Wind while not Bloodied."},
-  // Cleric
-  {id:"cleric_order",name:"Expanded Order",type:"Cleric",desc:"Req: Cleric Order. Gain 2 additional Divine Domains. Can't choose the same option twice."},
-  {id:"cleric_bless",name:"Bountiful Blessings",type:"Cleric",desc:"Req: Divine Blessing, Lv3. Free Blessing at combat start. Hold 2 Blessings — not both on same creature."},
-  {id:"cleric_cleanse",name:"Divine Cleanse",type:"Cleric",desc:"Req: Channel Divinity, Lv3. Saving Grace Reaction to help allies. Cleansing Intervention removes afflictions."},
-  // Commander
-  {id:"cmd_seize",name:"Seize Momentum",type:"Commander",desc:"Req: Commander's Call, Commanding Aura, Lv3. Use Commander's Call as Reaction on ally's Heavy Hit."},
-  {id:"cmd_coord",name:"Coordinated Command",type:"Commander",desc:"Req: Commander's Call, Lv3. Spend 1 extra SP to target a second creature with your Commander's Call."},
-  // Druid
-  {id:"druid_wild",name:"Wild Form Expansion",type:"Druid",desc:"Req: Wild Form, Lv3. Free transform at turn start 1/rest. +2 Trait Points on Wild Form usage."},
-  {id:"druid_vort",name:"Nature's Vortex",type:"Druid",desc:"Req: Nature's Torrent, Lv3. Expand torrent size, grant ally immunity, and spend 2 AP for aura version."},
-  // Hunter
-  {id:"hunter_terr",name:"Expanded Terrains",type:"Hunter",desc:"Req: Favored Terrain. Gain 2 additional Favored Terrains. Can't choose the same option more than once."},
-  {id:"hunter_pack",name:"Pack Leader",type:"Hunter",desc:"Req: Hunter's Mark, Lv3. Allies add a d4 to their first Attack each turn against your Marked target."},
-  {id:"hunter_big",name:"Big Game Hunter",type:"Hunter",desc:"Req: Hunter's Mark, Lv3. +1 damage vs Large+ Marked targets, ADV on their saves and Analyze Creature."},
-  // Monk
-  {id:"monk_stance",name:"Expanded Stances",type:"Monk",desc:"Req: Monk Stance. Learn 2 more Monk Stances. Enter a Stance without spending SP once per turn."},
-  {id:"monk_int",name:"Internal Damage",type:"Monk",desc:"Req: Monk Features, Lv3. Spend SP on Unarmed Strike to impose Repeated Physical Save → Impaired."},
-  {id:"monk_steel",name:"Steel Fist",type:"Monk",desc:"Req: Monk Training, Lv3. Unarmed Strikes gain Impact. Once/turn make a Flurry Strike for 1 SP."},
-  // Rogue
-  {id:"rogue_unseen",name:"Unseen Ambusher",type:"Rogue",desc:"Req: Debilitating Strike, Lv3. Skulker: ADV Stealth in Combat. Backstab: Hidden enemies have DisADV on saves."},
-  {id:"rogue_sinister",name:"Sinister Shot",type:"Rogue",desc:"Req: Cheap Shot, Lv3. Cheap Shot deals +1 damage for each different Condition on the target."},
-  // Sorcerer
-  {id:"sorc_meta",name:"Expanded Meta Magic",type:"Sorcerer",desc:"Req: Meta Magic. Gain 2 additional Meta Magic options. Each can still only be used once per Spell."},
-  // Spellblade
-  {id:"sb_expanded",name:"Expanded Disciplines",type:"Spellblade",desc:"Req: Spellblade Disciplines. Gain 2 additional Spellblade Disciplines. Can't choose the same twice."},
-  {id:"sb_sling",name:"Sling-Blade",type:"Spellblade",desc:"Req: Bound Weapon, Spellstrike, Lv3. Distant Strike: Melee range +2. Spellstrike range matches weapon range."},
-  // Warlock
-  {id:"wlk_sub",name:"Warlock Subcontract",type:"Warlock",desc:"Req: Eldritch Pact. Gain a second Warlock Contract option from your subclass or the base Warlock list."},
-  // Wizard
-  {id:"wiz_sigil",name:"Enhanced Sigil",type:"Wizard",desc:"Req: Arcane Sigil. Linked Sigils share Schools. Linked Magic lets you cast from either connected Sigil."},
-  // Multiclass
-  {id:"multiclass",name:"Multiclass Talent",type:"Multiclass",desc:"Gain 1 Level 1 Class Feature from any Class. Must meet any prerequisites listed for that Feature."},
-  // Paragon
-  {id:"paragon_nov",name:"Novice Paragon",type:"Paragon",desc:"Req: Paragon Path, Lv3. Enhance your Paragon Subclass bonuses. Gain a Novice Paragon technique."},
-  {id:"paragon_adept",name:"Adept Paragon",type:"Paragon",desc:"Req: Paragon Path, Lv5. Increase all Paragon bonuses and gain an Adept Paragon technique."},
-  {id:"paragon_exp",name:"Expert Paragon",type:"Paragon",desc:"Req: Paragon Path, Lv9. Reach the pinnacle of your Paragon subclass with the Expert Paragon capstone."},
-  {id:"spell_path",name:"Spellcaster Path",type:"Paragon",desc:"Req: Spellcaster Class. MP Regen, Cantrips, expanded Spell List, and Spellcaster Path progression."},
-  {id:"mart_path",name:"Martial Path",type:"Paragon",desc:"Req: Martial Class. SP Regen, extra Combat Training, Maneuver enhancements, and Martial Path progression."}
+const TALENTS=[
+  {id:"ancestryinc",name:"Ancestry Increase",type:"General",desc:"Gain 4 Ancestry Points to spend on Ancestry Traits."},
+  {id:"attrinc",name:"Attribute Increase",type:"General",desc:"Gain 2 Attribute Points to put into any Attribute (up to Attribute Limit)."},
+  {id:"skillinc",name:"Skill Increase",type:"General",desc:"Gain 4 Skill Points. Can convert to Trade Points (1→2) or Language Points."},
+  {id:"tough",name:"Tough",type:"General",desc:"HP maximum increases by 2. Gain +1 Rest Points."},
+  {id:"alert",name:"Alert",type:"General",desc:"Can't be Surprised. +2 bonus to Initiative Checks."},
+  {id:"lucky",name:"Lucky",type:"General",desc:"Once per Long Rest, reroll any Check or Save and choose either result."},
+  {id:"martial_exp",name:"Martial Expansion",type:"General",desc:"Combat Training: Weapons, Heavy Armor, all Shields. Learn 2 Maneuvers. Stamina Regen."},
+  {id:"spell_exp",name:"Spellcasting Expansion",type:"General",desc:"Combat Training: Spell Focuses. Add 1 Spell Source or 3 Schools. Learn 3 Spells."},
+  {id:"barb_unfath",name:"Unfathomable Strength",type:"Barbarian",desc:"Req: Rage, Lv3. Titan Grip: Two-Handed Weapons one-handed while Raging. Jump +1."},
+  {id:"barb_swift",name:"Swift Berserker",type:"Barbarian",desc:"Req: Rage, Berserker, Lv3. Rage free on Initiative. Charge ignores Difficult Terrain."},
+  {id:"bard_expand",name:"Expanded Repertoire",type:"Bard",desc:"Req: Remarkable Repertoire, Lv3. +2 Skill Points, learn 2 Spells (any list), dual Manner."},
+  {id:"bard_help",name:"Helping Hands",type:"Bard",desc:"Req: Font of Inspiration, Lv3. Help Action grants bonus d8 to a second creature."},
+  {id:"champ_res",name:"Champion's Resolve",type:"Champion",desc:"Req: Adaptive Tactics, Lv3. Tactical Die Assault: +1 damage. Deflect: 1 damage back."},
+  {id:"champ_disc",name:"Disciplined Combatant",type:"Champion",desc:"Req: Fighting Spirit, Lv3. 2 SP for Combat Readiness once/turn. Second Wind unbloodied."},
+  {id:"cleric_order",name:"Expanded Order",type:"Cleric",desc:"Req: Cleric Order. Gain 2 additional Divine Domains."},
+  {id:"cleric_bless",name:"Bountiful Blessings",type:"Cleric",desc:"Req: Divine Blessing, Lv3. Free Blessing at combat start. Hold 2 Blessings."},
+  {id:"cleric_cleanse",name:"Divine Cleanse",type:"Cleric",desc:"Req: Channel Divinity, Lv3. Saving Grace Reaction. Cleansing Intervention removes afflictions."},
+  {id:"cmd_seize",name:"Seize Momentum",type:"Commander",desc:"Req: Commander's Call, Commanding Aura, Lv3. Use Call as Reaction on ally Heavy Hit."},
+  {id:"cmd_coord",name:"Coordinated Command",type:"Commander",desc:"Req: Commander's Call, Lv3. Spend 1 extra SP to target a second creature with your Call."},
+  {id:"druid_wild",name:"Wild Form Expansion",type:"Druid",desc:"Req: Wild Form, Lv3. Free transform at turn start 1/rest. +2 Trait Points on Wild Form."},
+  {id:"druid_vort",name:"Nature's Vortex",type:"Druid",desc:"Req: Nature's Torrent, Lv3. Expand torrent, grant immunity, 2 AP for aura version."},
+  {id:"hunter_terr",name:"Expanded Terrains",type:"Hunter",desc:"Req: Favored Terrain. Gain 2 additional Favored Terrains."},
+  {id:"hunter_pack",name:"Pack Leader",type:"Hunter",desc:"Req: Hunter's Mark, Lv3. Allies add d4 to first Attack against your Marked target."},
+  {id:"hunter_big",name:"Big Game Hunter",type:"Hunter",desc:"Req: Hunter's Mark, Lv3. +1 damage vs Large+ Marked, ADV on their saves."},
+  {id:"monk_stance",name:"Expanded Stances",type:"Monk",desc:"Req: Monk Stance. Learn 2 more Stances. Enter a Stance without SP once per turn."},
+  {id:"monk_int",name:"Internal Damage",type:"Monk",desc:"Req: Monk Features, Lv3. Spend SP on Unarmed Strike → Repeated Physical Save → Impaired."},
+  {id:"monk_steel",name:"Steel Fist",type:"Monk",desc:"Req: Monk Training, Lv3. Unarmed Strikes gain Impact. Flurry of Blows for 1 SP."},
+  {id:"rogue_unseen",name:"Unseen Ambusher",type:"Rogue",desc:"Req: Debilitating Strike, Lv3. ADV Stealth in Combat. Hidden enemies: DisADV on saves."},
+  {id:"rogue_sinister",name:"Sinister Shot",type:"Rogue",desc:"Req: Cheap Shot, Lv3. Cheap Shot +1 damage per Condition on target."},
+  {id:"sorc_meta",name:"Expanded Meta Magic",type:"Sorcerer",desc:"Req: Meta Magic. Gain 2 additional Meta Magic options."},
+  {id:"sb_expanded",name:"Expanded Disciplines",type:"Spellblade",desc:"Req: Spellblade Disciplines. Gain 2 additional Disciplines."},
+  {id:"sb_sling",name:"Sling-Blade",type:"Spellblade",desc:"Req: Bound Weapon, Spellstrike, Lv3. Distant Strike +2 range. Spellstrike = weapon range."},
+  {id:"wlk_sub",name:"Warlock Subcontract",type:"Warlock",desc:"Req: Eldritch Pact. Gain a second Warlock Contract option."},
+  {id:"wiz_sigil",name:"Enhanced Sigil",type:"Wizard",desc:"Req: Arcane Sigil. Linked Sigils share Schools. Cast through either Sigil."},
+  {id:"multiclass",name:"Multiclass Talent",type:"Multiclass",desc:"Gain 1 Level 1 Class Feature from any Class. Must meet prerequisites."},
+  {id:"paragon_nov",name:"Novice Paragon",type:"Paragon",desc:"Req: Paragon Path, Lv3. Enhance Paragon Subclass bonuses and technique."},
+  {id:"paragon_adept",name:"Adept Paragon",type:"Paragon",desc:"Req: Paragon Path, Lv5. Increase all Paragon bonuses. New technique."},
+  {id:"paragon_exp",name:"Expert Paragon",type:"Paragon",desc:"Req: Paragon Path, Lv9. Reach the pinnacle of your Paragon subclass."},
+  {id:"spell_path",name:"Spellcaster Path",type:"Paragon",desc:"Req: Spellcaster Class. MP Regen, Cantrips, expanded Spell List."},
+  {id:"mart_path",name:"Martial Path",type:"Paragon",desc:"Req: Martial Class. SP Regen, extra Combat Training, Maneuver enhancements."}
 ];
 
-const EQUIPMENT = [
-  {id:"longsword",name:"Longsword",desc:"Versatile (1d8/1d10) · Melee",type:"weapon"},
+const EQUIPMENT=[
+  {id:"longsword",name:"Longsword",desc:"Versatile 1d8/1d10 · Melee",type:"weapon"},
   {id:"shortsword",name:"Shortsword",desc:"Finesse · Light · 1d6 · Melee",type:"weapon"},
   {id:"shortbow",name:"Shortbow",desc:"Ranged · 1d6 · Range 15/45",type:"weapon"},
   {id:"longbow",name:"Longbow",desc:"Ranged · 1d8 · Range 25/100 · Two-Handed",type:"weapon"},
@@ -363,8 +378,8 @@ const EQUIPMENT = [
   {id:"greataxe",name:"Greataxe",desc:"Two-Handed · 1d12 · Heavy · Melee",type:"weapon"},
   {id:"greatsword",name:"Greatsword",desc:"Two-Handed · 2d6 · Heavy · Melee",type:"weapon"},
   {id:"dagger",name:"Dagger",desc:"Finesse · Thrown · Light · 1d4 · 4/12",type:"weapon"},
-  {id:"spear",name:"Spear",desc:"Versatile (1d6/1d8) · Thrown · 5/20",type:"weapon"},
-  {id:"staff",name:"Quarterstaff",desc:"Versatile (1d6/1d8) · Spell Focus · Melee",type:"weapon"},
+  {id:"spear",name:"Spear",desc:"Versatile 1d6/1d8 · Thrown · 5/20",type:"weapon"},
+  {id:"staff",name:"Quarterstaff",desc:"Versatile 1d6/1d8 · Spell Focus · Melee",type:"weapon"},
   {id:"wand",name:"Wand",desc:"Spell Focus · Light · Free Draw",type:"weapon"},
   {id:"orb",name:"Arcane Orb",desc:"Spell Focus · One-handed",type:"weapon"},
   {id:"lightarmor",name:"Light Armor",desc:"PD +2 · No Strength requirement",type:"armor"},
@@ -374,52 +389,65 @@ const EQUIPMENT = [
   {id:"heavyshield",name:"Heavy Shield",desc:"AD +2 · Requires Heavy Armor training",type:"armor"}
 ];
 
-const BACKGROUNDS = [
-  {id:"acolyte",name:"Acolyte",desc:"Raised in religious service. Pious and devoted.",skills:["religion","insight","medicine"]},
-  {id:"criminal",name:"Criminal",desc:"Lived outside the law. Knows the underworld.",skills:["stealth","trickery","investigation"]},
+const BACKGROUNDS=[
+  {id:"acolyte",name:"Acolyte",desc:"Raised in religious service.",skills:["religion","insight","medicine"]},
+  {id:"criminal",name:"Criminal",desc:"Life outside the law.",skills:["stealth","trickery","investigation"]},
   {id:"folk_hero",name:"Folk Hero",desc:"Common person who rose to prominence.",skills:["athletics","survival","animal"]},
-  {id:"noble",name:"Noble",desc:"Privileged upbringing in court society.",skills:["history","influence","performance"]},
+  {id:"noble",name:"Noble",desc:"Privileged court upbringing.",skills:["history","influence","performance"]},
   {id:"sage",name:"Sage",desc:"Scholar of arcane and worldly knowledge.",skills:["history","nature","investigation"]},
   {id:"soldier",name:"Soldier",desc:"Military training and battlefield discipline.",skills:["athletics","intimidation","medicine"]},
-  {id:"outlander",name:"Outlander",desc:"Wilderness survival expert and wanderer.",skills:["survival","athletics","nature"]},
-  {id:"entertainer",name:"Entertainer",desc:"Life on stage — performer, acrobat, story-teller.",skills:["performance","acrobatics","influence"]},
-  {id:"guild",name:"Guild Merchant",desc:"Trade and commerce background, deal-making.",skills:["influence","investigation","history"]},
+  {id:"outlander",name:"Outlander",desc:"Wilderness survival expert.",skills:["survival","athletics","nature"]},
+  {id:"entertainer",name:"Entertainer",desc:"Life on stage — performer and story-teller.",skills:["performance","acrobatics","influence"]},
+  {id:"guild",name:"Guild Merchant",desc:"Trade and commerce background.",skills:["influence","investigation","history"]},
   {id:"hermit",name:"Hermit",desc:"Solitary life of study and reflection.",skills:["medicine","religion","nature"]}
 ];
 
-// Character state
-let C = {
-  name:"", concept:"", pronouns:"",
-  ancestry1:null, ancestry2:null,
-  classId:null, subclassId:null,
+let C={
+  name:"",concept:"",pronouns:"",
+  ancestry1:null,ancestry2:null,
+  classId:null,subclassId:null,
   attrs:{might:0,agility:0,charisma:0,intelligence:0},
   background:null,
-  skills:{}, trades:{},
-  equipment:[],
-  spells:[], maneuvers:[],
-  talents:[],
+  skills:{},trades:{},
+  equipment:[],spells:[],maneuvers:[],talents:[],
+  level:1,
   step:0,
-  _classFilter:"all",
-  _spellFilter:"All",
-  _talentFilter:"All",
-  _skillTab:"skills",
-  _eqTab:"weapon"
+  _cf:"all",_sf:"All",_tf:"All",_skt:"skills",_eqt:"weapon"
 };
 
-function pm(){return Math.max(C.attrs.might,C.attrs.agility,C.attrs.charisma,C.attrs.intelligence)}
+function pm(){return Math.max(...Object.values(C.attrs))}
 function getCls(){return CLASSES.find(c=>c.id===C.classId)||null}
-function calcHP(){const cl=getCls();return cl?cl.hp+C.attrs.might:8+C.attrs.might}
-function calcPD(){return 8+1+C.attrs.agility+C.attrs.intelligence}
-function calcAD(){return 8+1+C.attrs.might+C.attrs.charisma}
-function calcSaveDC(){return 14}
-function totalSP(){return 5+C.attrs.intelligence}
-function spentSP(){return Object.values(C.skills).reduce((a,b)=>a+b,0)}
-function spentTP(){return Object.values(C.trades).reduce((a,b)=>a+b,0)}
-function attrSpent(){return Object.values(C.attrs).reduce((a,b)=>a+(b+2),0)}
-function attrLeft(){return 12-attrSpent()}
+function calcHP(){
+  const cl=getCls();const base=cl?cl.hp:8;
+  const lvRow=getLvRow(C.level);
+  // HP from Might + Class HP + any Might gained from level ups
+  return base+C.attrs.might;
+}
+function calcCM(){return getCM(C.level)}
+function calcPD(){return 8+calcCM()+C.attrs.agility+C.attrs.intelligence}
+function calcAD(){return 8+calcCM()+C.attrs.might+C.attrs.charisma}
+function calcDC(){return 10+calcCM()+pm()}
+function calcAtk(){const v=calcCM()+pm();return v>=0?'+'+v:v}
+function calcGrit(){return Math.max(0,2+C.attrs.charisma)}
+function calcJump(){return Math.max(1,C.attrs.agility)}
+function calcSP(){const cl=getCls();return cl?cl.sp:0}
+function calcMP(){const cl=getCls();return cl?cl.mp:0}
+function getAttrPtTotal(){return getTotalAttrPts(C.level)}
+function getAttrSpent(){return Object.values(C.attrs).reduce((a,b)=>a+(b+2),0)}
+function getAttrLeft(){return getAttrPtTotal()-getAttrSpent()}
+function getSkPtTotal(){return getTotalSkPts(C.level,C.attrs.intelligence)}
+function getSkSpent(){return Object.values(C.skills).reduce((a,b)=>a+b,0)}
+function getSkLeft(){return getSkPtTotal()-getSkSpent()}
+function getTrPtTotal(){return getTotalTrPts(C.level)}
+function getTrSpent(){return Object.values(C.trades).reduce((a,b)=>a+b,0)}
+function getTrLeft(){return getTrPtTotal()-getTrSpent()}
+function maxSkillLvl(){return getSkCap(C.level)}
 
 function renderAll(){
-  renderStepBar();
+  const bar=document.getElementById("sBar");
+  const lbl=document.getElementById("sLbl");
+  bar.innerHTML=STEPS.map((s,i)=>`<div class="pip ${i<C.step?'done':i===C.step?'active':''}" onclick="goto(${i})" title="${s}"></div>`).join('');
+  lbl.textContent=`Step ${C.step+1} of ${STEPS.length}: ${STEPS[C.step]}`;
   const p=document.getElementById("panels");
   p.innerHTML='';
   const d=document.createElement("div");
@@ -427,507 +455,682 @@ function renderAll(){
   d.innerHTML=getStep(C.step);
   p.appendChild(d);
 }
-
-function renderStepBar(){
-  document.getElementById("stepBar").innerHTML=STEPS.map((s,i)=>`<div class="step-pip ${i<C.step?'done':i===C.step?'active':''}" onclick="goTo(${i})" title="${s}"></div>`).join('');
-  document.getElementById("stepLabel").textContent=`Step ${C.step+1} of ${STEPS.length}: ${STEPS[C.step]}`;
-}
-
-function goTo(n){C.step=n;renderAll()}
+function goto(n){C.step=n;renderAll()}
 function nav(d){C.step=Math.max(0,Math.min(STEPS.length-1,C.step+d));renderAll()}
-
-function navBtns(back,canNext){
-  return `<div class="nav-row">
-    ${back?`<button class="back-btn" onclick="nav(-1)">← Back</button>`:`<div></div>`}
-    <button class="next-btn" onclick="nav(1)" ${!canNext?'disabled':''}>Next →</button>
-  </div>`;
+function nb(back,ok){
+  return `<div class="nav">${back?`<button class="bck" onclick="nav(-1)">← Back</button>`:'<div></div>'}
+  <button class="nxt" onclick="nav(1)" ${!ok?'disabled':''}>Next →</button></div>`;
 }
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+function toast(m){const e=document.getElementById('toast');e.textContent=m;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),2500)}
 
 function getStep(s){
-  if(s===0)return s0();
-  if(s===1)return s1();
-  if(s===2)return s2();
-  if(s===3)return s3();
-  if(s===4)return s4();
-  if(s===5)return s5();
-  if(s===6)return s6();
-  if(s===7)return s7();
-  if(s===8)return s8();
-  if(s===9)return s9();
+  if(s===0)return s0();if(s===1)return s1();if(s===2)return s2();
+  if(s===3)return s3();if(s===4)return s4();if(s===5)return s5();
+  if(s===6)return s6();if(s===7)return s7();if(s===8)return s8();
+  if(s===9)return s9();if(s===10)return s10();
   return "";
 }
 
-// Step 0: Concept
+// ── Step 0: Concept ─────────────────────────────────────────
 function s0(){
   setTimeout(()=>{
-    const n=document.getElementById('inp-name');
-    const pr=document.getElementById('inp-pronouns');
-    const co=document.getElementById('inp-concept');
-    if(n)n.addEventListener('input',e=>C.name=e.target.value);
-    if(pr)pr.addEventListener('input',e=>C.pronouns=e.target.value);
-    if(co)co.addEventListener('input',e=>C.concept=e.target.value);
-  },50);
-  return `<div class="sec-title">Tell us about your character</div>
-<div class="sec-sub">Every hero starts with a concept. Who are they, and what drives them?</div>
+    const n=document.getElementById('in');const pr=document.getElementById('ipr');const co=document.getElementById('ico');
+    if(n){n.value=C.name;n.oninput=e=>C.name=e.target.value}
+    if(pr){pr.value=C.pronouns;pr.oninput=e=>C.pronouns=e.target.value}
+    if(co){co.value=C.concept;co.oninput=e=>C.concept=e.target.value}
+  },30);
+  return `<div class="stit">Tell us about your character</div>
+<div class="ssub">Every hero starts with a concept — who are they, and what drives them?</div>
 <label class="lbl" style="margin-top:0">Character name</label>
-<input class="char-input" id="inp-name" placeholder="Enter name…" value="${esc(C.name)}">
+<input class="inp" id="in" placeholder="Enter name…">
 <label class="lbl">Pronouns <span style="font-weight:400;color:var(--text2)">(optional)</span></label>
-<input class="char-input" id="inp-pronouns" placeholder="they/them, she/her, he/him…" value="${esc(C.pronouns)}">
-<label class="lbl">Concept &amp; backstory</label>
-<textarea class="char-input" id="inp-concept" placeholder="Describe your character — their history, motivation, personality…">${esc(C.concept)}</textarea>
-<div class="info-box"><i class="ti ti-info-circle"></i> DC20 uses 4 Attributes (Might, Agility, Charisma, Intelligence), Skills, and Masteries. You'll pick an Ancestry, Class, Background, and build stats with Point Buy. This creator covers Level 1 character creation per Beta 0.10 rules.</div>
-${navBtns(false,true)}`;
+<input class="inp" id="ipr" placeholder="they/them, she/her, he/him…">
+<label class="lbl">Concept & backstory</label>
+<textarea class="inp" id="ico" placeholder="Describe your character — history, motivation, personality…"></textarea>
+<div class="infobox">DC20 uses 4 Attributes, Skills, and Masteries. You'll pick Ancestry, Class, Background, and build stats with Point Buy. This creator supports Levels 1–10 per Beta 0.10 rules.</div>
+${nb(false,true)}`;
 }
 
-// Step 1: Ancestry
+// ── Step 1: Ancestry ─────────────────────────────────────────
 function s1(){
-  return `<div class="sec-title">Choose your ancestry</div>
-<div class="sec-sub">Your ancestry represents your biology and heritage. Pick 1 or 2 ancestries. You start with 5 Ancestry Points to spend on Ancestry Traits.</div>
-<div class="info-box"><i class="ti ti-dna"></i> Choosing 2 ancestries gives access to both Trait lists. You still only get 5 points total.</div>
-<div class="lbl" style="margin-top:0">Primary ancestry</div>
-<div class="grid3">
-${ANCESTRIES.map(a=>`<div class="card-pick ${C.ancestry1===a.id?'selected':''}" onclick="pickAnc(1,'${a.id}')">
-  <div class="name">${a.name}</div>
-  <div class="sub">${a.desc}</div>
-  <div style="margin-top:5px;font-size:10px;color:var(--text3)">${a.traits}</div>
-</div>`).join('')}
-</div>
-<div class="sec-break"></div>
-<div class="lbl">Secondary ancestry <span style="font-weight:400;color:var(--text2)">(optional)</span></div>
-<div class="grid3">
-${ANCESTRIES.map(a=>`<div class="card-pick ${C.ancestry2===a.id?'selected':''}" onclick="pickAnc(2,'${a.id}')">
-  <div class="name">${a.name}</div>
-  <div class="sub" style="font-size:11px">${a.desc}</div>
-</div>`).join('')}
-</div>
-${navBtns(true,!!C.ancestry1)}`;
+  return `<div class="stit">Choose your ancestry</div>
+<div class="ssub">Your ancestry represents your biology and heritage. Pick 1 or 2 ancestries — you start with 5 Ancestry Points (gained at levels 1, 4, and 7).</div>
+<div class="infobox">Choosing 2 ancestries gives access to both Trait lists — you still spend only 5 points total.</div>
+<label class="lbl" style="margin-top:0">Primary ancestry</label>
+<div class="grid3">${ANCESTRIES.map(a=>`<div class="cp ${C.ancestry1===a.id?'sel':''}" onclick="pickAnc(1,'${a.id}')">
+<div class="nm">${a.name}</div><div class="sb">${a.desc}</div>
+<div style="margin-top:4px;font-size:10px;color:var(--text3)">${a.traits}</div></div>`).join('')}</div>
+<div class="br"></div>
+<label class="lbl">Secondary ancestry <span style="font-weight:400;color:var(--text2)">(optional)</span></label>
+<div class="grid3">${ANCESTRIES.map(a=>`<div class="cp ${C.ancestry2===a.id?'sel':''}" onclick="pickAnc(2,'${a.id}')">
+<div class="nm">${a.name}</div><div class="sb" style="font-size:11px">${a.desc}</div></div>`).join('')}</div>
+${nb(true,!!C.ancestry1)}`;
 }
 
-// Step 2: Class
+// ── Step 2: Class ─────────────────────────────────────────
 function s2(){
   const cl=getCls();
-  const filtered=CLASSES.filter(c=>C._classFilter==='all'||c.type===C._classFilter);
-  return `<div class="sec-title">Choose your class</div>
-<div class="sec-sub">Your class defines your role in combat. Martials use Stamina Points, Spellcasters use Mana Points, and Hybrids use both. Subclasses are chosen at Level 3.</div>
-<div class="tabs">
-  ${['all','martial','spell','hybrid'].map(f=>`<div class="tab ${C._classFilter===f?'active':''}" onclick="filterCls('${f}')">${f==='all'?'All':f==='spell'?'Spellcaster':f.charAt(0).toUpperCase()+f.slice(1)}</div>`).join('')}
-</div>
-<div class="grid2">
-${filtered.map(c=>`<div class="card-pick ${C.classId===c.id?'selected':''}" onclick="pickCls('${c.id}')">
-  <div class="name">${c.name} <span class="badge ${c.type==='martial'?'b-martial':c.type==='hybrid'?'b-hybrid':'b-spell'}">${c.type}</span></div>
-  <div class="sub">HP ${c.hp} base${c.sp?` · SP ${c.sp}`:''}${c.mp?` · MP ${c.mp}`:''}</div>
-  <div class="sub" style="margin-top:4px">${c.desc}</div>
-</div>`).join('')}
-</div>
-${cl?`<div class="sec-break"></div>
-<div class="lbl">Subclass choice <span style="font-weight:400;color:var(--text2)">(preview — chosen at Level 3)</span></div>
-<div class="subclass-grid">
-${cl.subclasses.map(sc=>`<div class="sc-card ${C.subclassId===sc.id?'selected':''}" onclick="pickSC('${sc.id}')">
-  <div class="sname">${sc.name} ${sc.paragon?'<span class="badge b-paragon">Paragon</span>':''}</div>
-  <div class="sdesc">${sc.desc}</div>
-</div>`).join('')}
-</div>`:''}
-${navBtns(true,!!C.classId)}`;
+  const fil=CLASSES.filter(c=>C._cf==='all'||c.type===C._cf);
+  return `<div class="stit">Choose your class</div>
+<div class="ssub">Classes define your role. Martials use Stamina Points (SP), Spellcasters use Mana Points (MP). Subclasses unlock at Level 3.</div>
+<div class="tabs">${['all','martial','spell','hybrid'].map(f=>`<div class="tab ${C._cf===f?'active':''}" onclick="fCls('${f}')">${f==='all'?'All':f==='spell'?'Spellcaster':f.charAt(0).toUpperCase()+f.slice(1)}</div>`).join('')}</div>
+<div class="grid2">${fil.map(c=>`<div class="cp ${C.classId===c.id?'sel':''}" onclick="pickCls('${c.id}')">
+<div class="nm">${c.name} <span class="badge ${c.type==='martial'?'bm':c.type==='hybrid'?'bh':'bs'}">${c.type}</span></div>
+<div class="sb">HP ${c.hp} base${c.sp?` · SP ${c.sp}`:''}${c.mp?` · MP ${c.mp}`:''}</div>
+<div class="sb" style="margin-top:3px">${c.desc}</div></div>`).join('')}</div>
+${cl?`<div class="br"></div>
+<label class="lbl">Subclass preview <span style="font-weight:400;color:var(--text2)">(chosen at Level 3)</span></label>
+<div class="scgrid">${cl.subclasses.map(sc=>`<div class="scp ${C.subclassId===sc.id?'sel':''}" onclick="pickSC('${sc.id}')">
+<div class="spn">${sc.name} ${sc.paragon?'<span class="badge bp">Paragon</span>':''}</div>
+<div class="spd">${sc.desc}</div></div>`).join('')}</div>`:''}
+${nb(true,!!C.classId)}`;
 }
 
-// Step 3: Attributes
+// ── Step 3: Attributes ─────────────────────────────────────────
 function s3(){
-  const left=attrLeft();
-  return `<div class="sec-title">Set your attributes</div>
-<div class="sec-sub">Use <strong>Point Buy</strong>: start at −2 in all attributes and spend 12 points. Maximum is +3. Your Prime Modifier is your highest attribute and drives your Save DC (10 + CM + Prime = 14 at Level 1).</div>
-<div class="points-left">Points remaining: <strong>${left}</strong> / 12 &nbsp;·&nbsp; Prime Modifier: <strong>${pm()>=0?'+'+pm():pm()}</strong></div>
-${ATTRIBUTES.map(a=>{
-  const v=C.attrs[a.id];
-  return `<div class="attr-row">
-    <div class="attr-name">${a.name}</div>
-    <div class="attr-desc">${a.desc}</div>
-    <div class="attr-ctrl">
-      <button onclick="chAttr('${a.id}',-1)" ${v<=-2?'disabled':''}>−</button>
-      <div class="attr-val">${v>=0?'+'+v:v}</div>
-      <button onclick="chAttr('${a.id}',1)" ${v>=3||left<=0?'disabled':''}>+</button>
-    </div>
-  </div>`;
-}).join('')}
-<div class="tip" style="margin-top:8px">💡 Tip: Make sure at least one attribute is +3 to maximize your Prime Modifier and combat effectiveness.</div>
-${navBtns(true,true)}`;
+  const left=getAttrLeft();const cap=getAttrCap(C.level);const tot=getAttrPtTotal();
+  return `<div class="stit">Set your attributes</div>
+<div class="ssub">Point Buy: start at −2 in all attributes, spend ${tot} points (base 12 + level bonuses). Cap is +${cap} at Level ${C.level}. Your Prime Modifier (highest attribute) drives your Save DC and Attack Checks.</div>
+<div class="pts">Points remaining: <strong>${left}</strong> / ${tot} &nbsp;·&nbsp; Prime Modifier: <strong>${pm()>=0?'+'+pm():pm()}</strong> &nbsp;·&nbsp; Attribute Cap: <strong>+${cap}</strong></div>
+${ATTRS.map(a=>{const v=C.attrs[a.id];return `<div class="arow">
+<div class="anm">${a.name}</div><div class="ads">${a.desc}</div>
+<div class="ac">
+<button onclick="chA('${a.id}',-1)" ${v<=-2?'disabled':''}>−</button>
+<div class="av">${v>=0?'+'+v:v}</div>
+<button onclick="chA('${a.id}',1)" ${v>=cap||left<=0?'disabled':''}>+</button>
+</div></div>`;}).join('')}
+<div class="tip" style="margin-top:8px">💡 Get at least +${cap} in one attribute for your Prime Modifier.</div>
+${nb(true,true)}`;
 }
 
-// Step 4: Background
+// ── Step 4: Background ─────────────────────────────────────────
 function s4(){
-  return `<div class="sec-title">Choose your background</div>
-<div class="sec-sub">Your background represents your upbringing and life before adventuring. It grants <strong>5 Skill Points</strong>, <strong>3 Trade Points</strong>, and <strong>2 Language Points</strong> (Common + 2 of your choice).</div>
-<div class="grid2">
-${BACKGROUNDS.map(b=>`<div class="card-pick ${C.background===b.id?'selected':''}" onclick="pickBg('${b.id}')">
-  <div class="name">${b.name}</div>
-  <div class="sub">${b.desc}</div>
-  <div style="margin-top:4px;font-size:10px;color:var(--text3)">Suggested: ${b.skills.join(' · ')}</div>
-</div>`).join('')}
-</div>
-<div class="info-box" style="margin-top:10px"><i class="ti ti-scroll"></i> Background Traits are flavor features coming in a future DC20 update. They provide roleplay benefits without mechanical impact.</div>
-${navBtns(true,!!C.background)}`;
+  const lv=C.level;const trPt=getTrPtTotal();
+  return `<div class="stit">Choose your background</div>
+<div class="ssub">Your background grants <strong>${getSkPtTotal()} Skill Points</strong> (5 + Intelligence × levels), <strong>${trPt} Trade Points</strong>, and <strong>2 Language Points</strong> (Common + choice).</div>
+<div class="grid2">${BACKGROUNDS.map(b=>`<div class="cp ${C.background===b.id?'sel':''}" onclick="pickBg('${b.id}')">
+<div class="nm">${b.name}</div><div class="sb">${b.desc}</div>
+<div style="margin-top:4px;font-size:10px;color:var(--text3)">Suggested: ${b.skills.join(' · ')}</div></div>`).join('')}</div>
+${nb(true,!!C.background)}`;
 }
 
-// Step 5: Skills & Trades
+// ── Step 5: Skills & Trades ─────────────────────────────────────────
 function s5(){
   const bg=BACKGROUNDS.find(b=>b.id===C.background);
-  const tSP=totalSP(); const lSP=tSP-spentSP(); const lTP=3-spentTP();
-  return `<div class="sec-title">Skills &amp; trades</div>
-<div class="sec-sub">Spend Skill Points on Skills (max Novice/1 at Level 1). Intelligence modifies your total Skill Points. 1 Skill Point converts to 2 Trade Points.</div>
-<div class="points-left">Skill Points: <strong>${lSP}</strong>/${tSP} &nbsp;·&nbsp; Trade Points: <strong>${lTP}</strong>/3</div>
+  const tSP=getSkPtTotal();const lSP=getSkLeft();const lTP=getTrLeft();const maxSk=maxSkillLvl();
+  return `<div class="stit">Skills & trades</div>
+<div class="ssub">Spend Skill Points on Skills (max: ${getLvRow(C.level).skCap}). Your Mastery Cap increases with level. 1 Skill Point = 2 Trade Points.</div>
+<div class="pts">Skill Points: <strong>${lSP}</strong>/${tSP} &nbsp;·&nbsp; Trade Points: <strong>${lTP}</strong>/${getTrPtTotal()} &nbsp;·&nbsp; Mastery Cap: <strong>${getLvRow(C.level).skCap} (${maxSk})</strong></div>
 <div class="tabs">
-  <div class="tab ${C._skillTab==='skills'?'active':''}" onclick="switchSkillTab('skills')">Skills (${spentSP()}/${tSP})</div>
-  <div class="tab ${C._skillTab==='trades'?'active':''}" onclick="switchSkillTab('trades')">Trades (${spentTP()}/3)</div>
+<div class="tab ${C._skt==='skills'?'active':''}" onclick="swSK('skills')">Skills (${getSkSpent()}/${tSP})</div>
+<div class="tab ${C._skt==='trades'?'active':''}" onclick="swSK('trades')">Trades (${getTrSpent()}/${getTrPtTotal()})</div>
 </div>
-<div id="skills-panel" style="${C._skillTab!=='skills'?'display:none':''}">
-${SKILLS.map(sk=>{
-  const v=C.skills[sk.id]||0;
-  const isBg=bg&&bg.skills.includes(sk.id);
-  return `<div class="skill-row">
-    <div class="skill-name">${sk.name}${isBg?` <span style="font-size:10px;color:var(--green)">✓ bg</span>`:''}</div>
-    <div class="skill-attr">${sk.attr}</div>
-    <div class="skill-ctrl">
-      <button onclick="chSkill('${sk.id}',-1)" ${v<=0?'disabled':''}>−</button>
-      <div class="skill-val">${v}</div>
-      <button onclick="chSkill('${sk.id}',1)" ${v>=1||lSP<=0?'disabled':''}>+</button>
-    </div>
-    <span class="dot ${v>=1?'on':''}"></span>
-  </div>`;
-}).join('')}
+<div id="sk-pnl" style="${C._skt!=='skills'?'display:none':''}">
+${SKILLS.map(sk=>{const v=C.skills[sk.id]||0;const isBg=bg&&bg.skills.includes(sk.id);
+return `<div class="skrow">
+<div class="sknm">${sk.name}${isBg?` <span style="font-size:10px;color:var(--green)">✓bg</span>`:''}</div>
+<div class="skat">${sk.attr}</div>
+<div class="skc">
+<button onclick="chSK('${sk.id}',-1)" ${v<=0?'disabled':''}>−</button>
+<div class="skv">${v}</div>
+<button onclick="chSK('${sk.id}',1)" ${v>=maxSk||lSP<=0?'disabled':''}>+</button>
 </div>
-<div id="trades-panel" style="${C._skillTab!=='trades'?'display:none':''}">
-${TRADES.map(tr=>{
-  const v=C.trades[tr.id]||0;
-  return `<div class="skill-row">
-    <div class="skill-name">${tr.name}</div>
-    <div class="skill-attr">Trade</div>
-    <div class="skill-ctrl">
-      <button onclick="chTrade('${tr.id}',-1)" ${v<=0?'disabled':''}>−</button>
-      <div class="skill-val">${v}</div>
-      <button onclick="chTrade('${tr.id}',1)" ${v>=1||lTP<=0?'disabled':''}>+</button>
-    </div>
-    <span class="dot ${v>=1?'on':''}"></span>
-  </div>`;
-}).join('')}
+${[...Array(maxSk)].map((_,i)=>`<span class="dot ${v>i?'on':''}"></span>`).join('')}
+</div>`;}).join('')}
 </div>
-${navBtns(true,true)}`;
+<div id="tr-pnl" style="${C._skt!=='trades'?'display:none':''}">
+${TRADES.map(tr=>{const v=C.trades[tr.id]||0;
+return `<div class="skrow">
+<div class="sknm">${tr.name}</div><div class="skat">Trade</div>
+<div class="skc">
+<button onclick="chTR('${tr.id}',-1)" ${v<=0?'disabled':''}>−</button>
+<div class="skv">${v}</div>
+<button onclick="chTR('${tr.id}',1)" ${v>=maxSk||lTP<=0?'disabled':''}>+</button>
+</div>
+${[...Array(maxSk)].map((_,i)=>`<span class="dot ${v>i?'on':''}"></span>`).join('')}
+</div>`;}).join('')}
+</div>
+${nb(true,true)}`;
 }
 
-// Step 6: Equipment
+// ── Step 6: Equipment ─────────────────────────────────────────
 function s6(){
-  const weapons=EQUIPMENT.filter(e=>e.type==='weapon');
-  const armors=EQUIPMENT.filter(e=>e.type==='armor');
-  return `<div class="sec-title">Starting equipment</div>
-<div class="sec-sub">Select your starting gear. In full DC20, your class and background determine specific starting equipment. Choose what fits your concept.</div>
+  const wps=EQUIPMENT.filter(e=>e.type==='weapon');const arm=EQUIPMENT.filter(e=>e.type==='armor');
+  return `<div class="stit">Starting equipment</div>
+<div class="ssub">Select your starting gear. Your class and background normally provide specific items — choose what fits your concept.</div>
 <div class="tabs">
-  <div class="tab ${C._eqTab==='weapon'?'active':''}" onclick="switchEqTab('weapon')">Weapons</div>
-  <div class="tab ${C._eqTab==='armor'?'active':''}" onclick="switchEqTab('armor')">Armor &amp; Shields</div>
+<div class="tab ${C._eqt==='weapon'?'active':''}" onclick="swEQ('weapon')">Weapons</div>
+<div class="tab ${C._eqt==='armor'?'active':''}" onclick="swEQ('armor')">Armor & Shields</div>
 </div>
-<div id="eq-weapon" style="${C._eqTab!=='weapon'?'display:none':''}">
-${weapons.map(e=>`<div class="equip-row">
-  <input type="checkbox" class="equip-check" id="eq-${e.id}" ${C.equipment.includes(e.id)?'checked':''} onchange="toggleEq('${e.id}')">
-  <label for="eq-${e.id}" style="flex:1;cursor:pointer">
-    <div class="equip-label">${e.name}</div>
-    <div class="equip-sub">${e.desc}</div>
-  </label>
-</div>`).join('')}
+<div id="eq-wp" style="${C._eqt!=='weapon'?'display:none':''}">
+${wps.map(e=>`<div class="eqrow">
+<input type="checkbox" class="eqck" id="eq-${e.id}" ${C.equipment.includes(e.id)?'checked':''} onchange="togEQ('${e.id}')">
+<label for="eq-${e.id}" style="flex:1;cursor:pointer">
+<div class="eqlb">${e.name}</div><div class="eqsb">${e.desc}</div></label></div>`).join('')}
 </div>
-<div id="eq-armor" style="${C._eqTab!=='armor'?'display:none':''}">
-${armors.map(e=>`<div class="equip-row">
-  <input type="checkbox" class="equip-check" id="eq-${e.id}" ${C.equipment.includes(e.id)?'checked':''} onchange="toggleEq('${e.id}')">
-  <label for="eq-${e.id}" style="flex:1;cursor:pointer">
-    <div class="equip-label">${e.name}</div>
-    <div class="equip-sub">${e.desc}</div>
-  </label>
-</div>`).join('')}
+<div id="eq-ar" style="${C._eqt!=='armor'?'display:none':''}">
+${arm.map(e=>`<div class="eqrow">
+<input type="checkbox" class="eqck" id="eq-${e.id}" ${C.equipment.includes(e.id)?'checked':''} onchange="togEQ('${e.id}')">
+<label for="eq-${e.id}" style="flex:1;cursor:pointer">
+<div class="eqlb">${e.name}</div><div class="eqsb">${e.desc}</div></label></div>`).join('')}
 </div>
-${navBtns(true,true)}`;
+${nb(true,true)}`;
 }
 
-// Step 7: Spells & Maneuvers
+// ── Step 7: Spells & Maneuvers ─────────────────────────────────────────
 function s7(){
-  const cl=getCls();
-  const isSpell=cl&&(cl.type==='spell'||cl.type==='hybrid');
-  const maxSpells=cl?(cl.type==='spell'?3:cl.type==='hybrid'?2:0):0;
-  const maxMan=cl?(cl.type==='martial'?3:2):1;
+  const cl=getCls();const isSp=cl&&(cl.type==='spell'||cl.type==='hybrid');
+  const maxSp=cl?(cl.type==='spell'?3:cl.type==='hybrid'?2:0):0;
+  const maxMn=cl?(cl.type==='martial'?3:2):1;
   const schools=['All','Astromancy','Elemental','Enchantment','Invocation','Nullification','Transmutation'];
-  const filteredSpells=C._spellFilter==='All'?SPELLS:SPELLS.filter(s=>s.school===C._spellFilter);
-  return `<div class="sec-title">Spells &amp; maneuvers</div>
-<div class="sec-sub">${isSpell?`As a ${cl.name}, select up to ${maxSpells} spells from your spell list. `:''}Select up to ${maxMan} maneuver${maxMan!==1?'s':''} that fit your combat style.</div>
-${isSpell?`<div class="lbl" style="margin-top:0">Spells <span style="font-weight:400;color:var(--text2)">(${C.spells.length}/${maxSpells} chosen)</span></div>
-<div class="tabs">${schools.map(s=>`<div class="tab ${C._spellFilter===s?'active':''}" onclick="filterSpells('${s}')">${s}</div>`).join('')}</div>
-<div class="grid2">
-${filteredSpells.map(sp=>`<div class="spell-card ${C.spells.includes(sp.id)?'selected':''}" onclick="toggleSpell('${sp.id}',${maxSpells})">
-  <div class="sname">${sp.name}</div>
-  <div class="smeta">${sp.cost} · ${sp.range}</div>
-  <div class="smeta" style="margin-top:3px;line-height:1.4">${sp.desc.substring(0,100)}${sp.desc.length>100?'…':''}</div>
-  <div style="margin-top:4px"><span class="stag">${sp.school}</span><span class="stag">${sp.src}</span></div>
-</div>`).join('')}
-</div>
-<div class="sec-break"></div>`:''}
-<div class="lbl">Maneuvers <span style="font-weight:400;color:var(--text2)">(${C.maneuvers.length}/${maxMan} chosen)</span></div>
-<div class="grid2">
-${MANEUVERS.map(m=>`<div class="spell-card ${C.maneuvers.includes(m.id)?'selected':''}" onclick="toggleMan('${m.id}',${maxMan})">
-  <div class="sname">${m.name}</div>
-  <div class="smeta">${m.cost}</div>
-  <div class="smeta" style="margin-top:3px;line-height:1.4">${m.desc}</div>
-  <span class="stag">${m.type}</span>
-</div>`).join('')}
-</div>
-${navBtns(true,true)}`;
+  const fSpells=C._sf==='All'?SPELLS:SPELLS.filter(s=>s.school===C._sf);
+  return `<div class="stit">Spells & maneuvers</div>
+<div class="ssub">${isSp?`As a ${cl.name}, choose up to ${maxSp} spells. `:''}Choose up to ${maxMn} maneuver${maxMn!==1?'s':''} for your combat style.</div>
+${isSp?`<label class="lbl" style="margin-top:0">Spells <span style="font-weight:400;color:var(--text2)">(${C.spells.length}/${maxSp})</span></label>
+<div class="tabs">${schools.map(s=>`<div class="tab ${C._sf===s?'active':''}" onclick="fSp('${s}')">${s}</div>`).join('')}</div>
+<div class="grid2">${fSpells.map(sp=>`<div class="sc ${C.spells.includes(sp.id)?'sel':''}" onclick="togSp('${sp.id}',${maxSp})">
+<div class="sn">${sp.name}</div><div class="sm">${sp.cost} · ${sp.range}</div>
+<div class="sm" style="margin-top:2px;line-height:1.4">${sp.desc.substring(0,90)}${sp.desc.length>90?'…':''}</div>
+<div style="margin-top:4px"><span class="stag">${sp.school}</span><span class="stag">${sp.src}</span></div></div>`).join('')}</div>
+<div class="br"></div>`:''}
+<label class="lbl">Maneuvers <span style="font-weight:400;color:var(--text2)">(${C.maneuvers.length}/${maxMn})</span></label>
+<div class="grid2">${MANEUVERS.map(m=>`<div class="sc ${C.maneuvers.includes(m.id)?'sel':''}" onclick="togMn('${m.id}',${maxMn})">
+<div class="sn">${m.name}</div><div class="sm">${m.cost}</div>
+<div class="sm" style="margin-top:2px;line-height:1.4">${m.desc}</div>
+<span class="stag">${m.type}</span></div>`).join('')}</div>
+${nb(true,true)}`;
 }
 
-// Step 8: Talents
+// ── Step 8: Talents ─────────────────────────────────────────
 function s8(){
   const types=['All','General','Barbarian','Bard','Champion','Cleric','Commander','Druid','Hunter','Monk','Rogue','Sorcerer','Spellblade','Warlock','Wizard','Paragon','Multiclass'];
-  const filtered=C._talentFilter==='All'?TALENTS:TALENTS.filter(t=>t.type===C._talentFilter);
-  return `<div class="sec-title">Talents</div>
-<div class="sec-sub">At Level 2 you choose 1 Talent. Class Talents require at least 1 Feature from that class. Paragon Talents unlock a special subclass path. Select up to 1 talent now.</div>
-<div class="tabs" style="flex-wrap:wrap">${types.map(t=>`<div class="tab ${C._talentFilter===t?'active':''}" onclick="filterTalents('${t}')">${t}</div>`).join('')}</div>
-<div class="scrollable">
-${filtered.map(t=>`<div class="talent-card ${C.talents.includes(t.id)?'selected':''}" onclick="toggleTalent('${t.id}')">
-  <div class="tname">${t.name} <span class="badge" style="background:var(--bg3);color:var(--text2)">${t.type}</span></div>
-  <div class="tdesc">${t.desc}</div>
+  const maxT=C.level>=2?Math.floor(C.level/2)+1:0;
+  const fil=C._tf==='All'?TALENTS:TALENTS.filter(t=>t.type===C._tf);
+  return `<div class="stit">Talents</div>
+<div class="ssub">At Level 2 you gain your first Talent; additional talents at certain levels. At Level ${C.level} you can choose up to <strong>${maxT} talent${maxT!==1?'s':''}</strong>. Class Talents require at least 1 Feature from that class.</div>
+<div class="tabs" style="flex-wrap:wrap">${types.map(t=>`<div class="tab ${C._tf===t?'active':''}" onclick="fTal('${t}')">${t}</div>`).join('')}</div>
+<div class="scroll">${fil.map(t=>`<div class="tc ${C.talents.includes(t.id)?'sel':''}" onclick="togTal('${t.id}',${maxT})">
+<div class="tn">${t.name} <span class="badge" style="background:var(--bg3);color:var(--text2)">${t.type}</span></div>
+<div class="td">${t.desc}</div></div>`).join('')}</div>
+${nb(true,true)}`;
+}
+
+// ── Step 9: Level & Progression ─────────────────────────────────────────
+function s9(){
+  const lv=C.level;const r=getLvRow(lv);
+  // cumulative attr pts
+  const totalA=getTotalAttrPts(lv);const totalS=getSkPtTotal();const totalT=getTrPtTotal();
+  return `<div class="stit">Level & progression</div>
+<div class="ssub">DC20 supports play from Level 1–10. Adjust your level below — attribute and skill points update automatically to reflect earned progression.</div>
+<div class="lvl-row">
+  <label>Character Level</label>
+  <select onchange="setLv(parseInt(this.value))">
+    ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option value="${n}" ${n===lv?'selected':''}>${n}</option>`).join('')}
+  </select>
+</div>
+<div class="infobox">
+  <strong>Level ${lv} stats:</strong> Combat Mastery +${r.cm} · Attribute Cap +${r.attrCap} · Skill Cap: ${r.skCap}<br>
+  Total Attribute Points: <strong>${totalA}</strong> · Total Skill Points: <strong>${totalS}</strong> · Total Trade Points: <strong>${totalT}</strong><br>
+  <em>${r.features}</em>
+</div>
+<table class="prog-table">
+<thead><tr><th>Lv</th><th>CM</th><th>Attr Cap</th><th>Skill Cap</th><th>Attr Pts (total)</th><th>Features</th></tr></thead>
+<tbody>
+${PROG.map(r=>`<tr class="${r.lv===lv?'cur':''}">
+  <td>${r.lv}${r.lv===lv?' ◀':''}</td>
+  <td>+${r.cm}</td>
+  <td>+${r.attrCap}</td>
+  <td>${r.skCap}</td>
+  <td class="hi">${getTotalAttrPts(r.lv)}</td>
+  <td style="font-size:11px;color:var(--text2)">${r.features}</td>
+</tr>`).join('')}
+</tbody>
+</table>
+${nb(true,true)}`;
+}
+
+// ── Step 10: Character Sheet ─────────────────────────────────────────
+function s10(){
+  const cl=getCls();
+  const a1=ANCESTRIES.find(a=>a.id===C.ancestry1);const a2=ANCESTRIES.find(a=>a.id===C.ancestry2);
+  const bg=BACKGROUNDS.find(b=>b.id===C.background);const sc=cl&&cl.subclasses.find(s=>s.id===C.subclassId);
+  const hp=calcHP(),pd=calcPD(),ad=calcAD(),cm=calcCM(),dc=calcDC(),atk=calcAtk(),grit=calcGrit(),jump=calcJump();
+  const sp=calcSP(),mp=calcMP();
+  const skList=Object.keys(C.skills).filter(k=>C.skills[k]>0).map(k=>({name:SKILLS.find(s=>s.id===k)?.name||k,lv:C.skills[k]}));
+  const trList=Object.keys(C.trades).filter(k=>C.trades[k]>0).map(k=>({name:TRADES.find(t=>t.id===k)?.name||k,lv:C.trades[k]}));
+  const skCap=getLvRow(C.level).skCap;
+  return `<div class="stit">Character sheet</div>
+<div class="sh-sec">
+  <div class="sh-name">${esc(C.name)||'Unnamed Hero'}</div>
+  <div class="sh-meta">${a1?a1.name:'—'}${a2?' / '+a2.name:''} · ${cl?cl.name:'—'}${sc?' ('+sc.name+')':''} · Level ${C.level} · ${bg?bg.name:'—'}</div>
+  ${C.pronouns?`<div class="sh-meta">${esc(C.pronouns)}</div>`:''}
+  ${C.concept?`<div style="font-size:12px;color:var(--text2);margin-top:6px;font-style:italic;line-height:1.5">"${esc(C.concept.substring(0,200))}${C.concept.length>200?'…':''}"</div>`:''}
+</div>
+<div class="sh-grid">
+  <div class="sh-stat"><div class="sh-lbl">Max HP</div><div class="sh-val">${hp}</div><div class="sh-sub">Class + Might</div></div>
+  <div class="sh-stat"><div class="sh-lbl">Prime Mod</div><div class="sh-val">${pm()>=0?'+'+pm():pm()}</div><div class="sh-sub">Highest attr</div></div>
+  <div class="sh-stat"><div class="sh-lbl">Prec. Defense</div><div class="sh-val">${pd}</div><div class="sh-sub">8+CM+Agi+Int</div></div>
+  <div class="sh-stat"><div class="sh-lbl">Area Defense</div><div class="sh-val">${ad}</div><div class="sh-sub">8+CM+Mgt+Cha</div></div>
+  <div class="sh-stat"><div class="sh-lbl">Save DC</div><div class="sh-val">${dc}</div><div class="sh-sub">10+CM+Prime</div></div>
+  <div class="sh-stat"><div class="sh-lbl">Atk / Spell</div><div class="sh-val">${atk}</div><div class="sh-sub">CM + Prime</div></div>
+  <div class="sh-stat"><div class="sh-lbl">Combat Mastery</div><div class="sh-val">+${cm}</div><div class="sh-sub">Lv ${C.level}</div></div>
+  <div class="sh-stat"><div class="sh-lbl">Grit Points</div><div class="sh-val">${grit}</div><div class="sh-sub">2 + Charisma</div></div>
+  <div class="sh-stat"><div class="sh-lbl">SP / MP</div><div class="sh-val">${sp}/${mp}</div><div class="sh-sub">Stamina/Mana</div></div>
+  <div class="sh-stat"><div class="sh-lbl">Move Speed</div><div class="sh-val">5</div><div class="sh-sub">Spaces</div></div>
+  <div class="sh-stat"><div class="sh-lbl">Jump Dist.</div><div class="sh-val">${jump}</div><div class="sh-sub">= Agility</div></div>
+  <div class="sh-stat"><div class="sh-lbl">Rest Points</div><div class="sh-val">${hp}</div><div class="sh-sub">= Max HP</div></div>
+</div>
+<div class="sh-sec">
+<h3>Attributes & Saves</h3>
+<div class="grid2">
+${ATTRS.map(a=>`<div style="display:flex;justify-content:space-between;padding:4px 10px;background:var(--bg3);border-radius:6px;font-size:13px">
+<span>${a.name}</span><strong>${C.attrs[a.id]>=0?'+'+C.attrs[a.id]:C.attrs[a.id]}</strong>
 </div>`).join('')}
 </div>
-${navBtns(true,true)}`;
+<div style="font-size:12px;color:var(--text2);margin-top:8px">
+Might Save: ${C.attrs.might>=0?'+':''}<strong>${C.attrs.might+cm}</strong> &nbsp;
+Agility Save: ${C.attrs.agility>=0?'+':''}<strong>${C.attrs.agility+cm}</strong> &nbsp;
+Charisma Save: ${C.attrs.charisma>=0?'+':''}<strong>${C.attrs.charisma+cm}</strong> &nbsp;
+Int Save: ${C.attrs.intelligence>=0?'+':''}<strong>${C.attrs.intelligence+cm}</strong>
+</div>
+</div>
+${skList.length?`<div class="sh-sec"><h3>Skills (${skCap})</h3><div style="display:flex;flex-wrap:wrap;gap:6px">
+${skList.map(sk=>`<span class="stag" style="font-size:12px;padding:3px 9px">${sk.name} +${sk.lv*2}</span>`).join('')}
+</div></div>`:''}
+${trList.length?`<div class="sh-sec"><h3>Trades (${skCap})</h3><div style="display:flex;flex-wrap:wrap;gap:6px">
+${trList.map(tr=>`<span class="stag" style="font-size:12px;padding:3px 9px">${tr.name}</span>`).join('')}
+</div></div>`:''}
+${C.equipment.length?`<div class="sh-sec"><h3>Equipment</h3>
+${C.equipment.map(id=>{const e=EQUIPMENT.find(x=>x.id===id);return e?`<div class="li"><strong>${e.name}</strong> — <span style="color:var(--text2)">${e.desc}</span></div>`:''}).join('')}
+</div>`:''}
+${C.spells.length?`<div class="sh-sec"><h3>Spells Known</h3>
+${C.spells.map(id=>{const s=SPELLS.find(x=>x.id===id);return s?`<div class="li"><strong>${s.name}</strong> <span class="stag">${s.school}</span> — <span style="color:var(--text2)">${s.cost} · ${s.range}</span></div>`:''}).join('')}
+</div>`:''}
+${C.maneuvers.length?`<div class="sh-sec"><h3>Maneuvers Known</h3>
+${C.maneuvers.map(id=>{const m=MANEUVERS.find(x=>x.id===id);return m?`<div class="li"><strong>${m.name}</strong> <span class="stag">${m.type}</span> — <span style="color:var(--text2)">${m.cost}</span></div>`:''}).join('')}
+</div>`:''}
+${C.talents.length?`<div class="sh-sec"><h3>Talents</h3>
+${C.talents.map(id=>{const t=TALENTS.find(x=>x.id===id);return t?`<div class="li"><strong>${t.name}</strong> <span class="badge" style="background:var(--bg3);color:var(--text2)">${t.type}</span></div>`:''}).join('')}
+</div>`:''}
+<div class="exp-row">
+<button class="ebtn sec" onclick="nav(-1)">← Back</button>
+<button class="ebtn" style="background:var(--green);color:#fff;border:none;font-weight:700" onclick="dlJSON()">⬇ Export JSON</button>
+</div>
+<button class="ebtn pri" style="width:100%;margin-top:8px" onclick="dlSheet()">⬇ Export DC20 Character Sheet (HTML)</button>`;
 }
 
-// Step 9: Character Sheet
-function s9(){
-  const cl=getCls();
-  const a1=ANCESTRIES.find(a=>a.id===C.ancestry1);
-  const a2=ANCESTRIES.find(a=>a.id===C.ancestry2);
-  const bg=BACKGROUNDS.find(b=>b.id===C.background);
-  const sc=cl&&cl.subclasses.find(s=>s.id===C.subclassId);
-  const hp=calcHP(), pd=calcPD(), ad=calcAD();
-  const sp=cl?cl.sp:0, mp=cl?cl.mp:0;
-  const grit=Math.max(0,2+C.attrs.charisma);
-  const jump=Math.max(1,C.attrs.agility);
-  const attrSave=(a)=>C.attrs[a]>=0?'+'+C.attrs[a]:String(C.attrs[a]);
-  return `<div class="sec-title">Character sheet</div>
-<div class="sheet-sec">
-  <div class="sheet-name">${C.name||'Unnamed Hero'}</div>
-  <div class="sheet-meta">${a1?a1.name:'—'}${a2?' / '+a2.name:''} · ${cl?cl.name:'—'}${sc?' ('+sc.name+' subclass)':''} · ${bg?bg.name:'—'}</div>
-  ${C.pronouns?`<div class="sheet-meta">${esc(C.pronouns)}</div>`:''}
-  ${C.concept?`<div style="font-size:12px;color:var(--text2);margin-top:6px;font-style:italic;line-height:1.4">"${esc(C.concept.substring(0,160))}${C.concept.length>160?'…':''}"</div>`:''}
-</div>
-<div class="sheet-grid">
-  <div class="stat-box"><div class="stat-label">Max HP</div><div class="stat-value">${hp}</div><div class="stat-sub">Class + Might</div></div>
-  <div class="stat-box"><div class="stat-label">Prime Mod</div><div class="stat-value">${pm()>=0?'+'+pm():pm()}</div><div class="stat-sub">Highest attr</div></div>
-  <div class="stat-box"><div class="stat-label">PD</div><div class="stat-value">${pd}</div><div class="stat-sub">Precision</div></div>
-  <div class="stat-box"><div class="stat-label">AD</div><div class="stat-value">${ad}</div><div class="stat-sub">Area</div></div>
-  <div class="stat-box"><div class="stat-label">Save DC</div><div class="stat-value">14</div><div class="stat-sub">10+CM+Prime</div></div>
-  <div class="stat-box"><div class="stat-label">Attack/Spell</div><div class="stat-value">+4</div><div class="stat-sub">CM + Prime</div></div>
-  <div class="stat-box"><div class="stat-label">Grit Points</div><div class="stat-value">${grit}</div><div class="stat-sub">2 + Charisma</div></div>
-  <div class="stat-box"><div class="stat-label">SP / MP</div><div class="stat-value">${sp}/${mp}</div><div class="stat-sub">Stamina/Mana</div></div>
-</div>
-<div class="sheet-sec">
-  <h3>Attributes &amp; saves</h3>
-  <div class="grid2">
-  ${ATTRIBUTES.map(a=>`<div style="display:flex;justify-content:space-between;padding:4px 8px;background:var(--bg3);border-radius:6px;font-size:13px">
-    <span>${a.name}</span><strong>${attrSave(a.id)}</strong>
-  </div>`).join('')}
-  </div>
-  <div style="font-size:12px;color:var(--text2);margin-top:8px">
-    Jump: ${jump} Spaces · Speed: 5 · Rest Points: ${hp} · Death's Door: −${Math.abs(pm())>0?Math.abs(pm()):4}
-  </div>
-</div>
-${C.spells.length?`<div class="sheet-sec"><h3>Spells known</h3>${C.spells.map(sid=>{const s=SPELLS.find(x=>x.id===sid);return s?`<div class="list-item"><strong>${s.name}</strong> — ${s.cost} · ${s.range} · <span style="color:var(--text2)">${s.school}</span></div>`:''}).join('')}</div>`:''}
-${C.maneuvers.length?`<div class="sheet-sec"><h3>Maneuvers known</h3>${C.maneuvers.map(mid=>{const m=MANEUVERS.find(x=>x.id===mid);return m?`<div class="list-item"><strong>${m.name}</strong> (${m.type}) — ${m.cost}</div>`:''}).join('')}</div>`:''}
-${C.talents.length?`<div class="sheet-sec"><h3>Talents</h3>${C.talents.map(tid=>{const t=TALENTS.find(x=>x.id===tid);return t?`<div class="list-item"><strong>${t.name}</strong> <span class="badge" style="background:var(--bg3);color:var(--text2)">${t.type}</span></div>`:''}).join('')}</div>`:''}
-${C.equipment.length?`<div class="sheet-sec"><h3>Equipment</h3>${C.equipment.map(eid=>{const e=EQUIPMENT.find(x=>x.id===eid);return e?`<div class="list-item">${e.name} — <span style="color:var(--text2)">${e.desc}</span></div>`:''}).join('')}</div>`:''}
-${Object.keys(C.skills).filter(k=>C.skills[k]>0).length?`<div class="sheet-sec"><h3>Skills (Novice)</h3><div style="display:flex;flex-wrap:wrap;gap:6px">${Object.keys(C.skills).filter(k=>C.skills[k]>0).map(k=>{const sk=SKILLS.find(s=>s.id===k);return sk?`<span class="stag" style="font-size:11px;padding:3px 8px">${sk.name}</span>`:''}).join('')}</div></div>`:''}
-<div class="final-row">
-  <button class="export-btn secondary" onclick="nav(-1)">← Back</button>
-  <button class="export-btn primary" onclick="downloadChar()">⬇ Download JSON</button>
-</div>
-<button class="export-btn primary" style="width:100%;margin-top:8px;background:#1D9E75" onclick="downloadHTML()">⬇ Export as HTML Sheet</button>`;
-}
-
-function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
-
-// Event handlers
+// ── Event handlers ─────────────────────────────────────────
 window.pickAnc=(n,id)=>{if(n===1)C.ancestry1=C.ancestry1===id?null:id;else C.ancestry2=C.ancestry2===id?null:id;renderAll()};
 window.pickCls=(id)=>{C.classId=id;C.subclassId=null;renderAll()};
 window.pickSC=(id)=>{C.subclassId=C.subclassId===id?null:id;renderAll()};
-window.filterCls=(f)=>{C._classFilter=f;renderAll()};
-window.filterSpells=(f)=>{C._spellFilter=f;renderAll()};
-window.filterTalents=(f)=>{C._talentFilter=f;renderAll()};
+window.fCls=(f)=>{C._cf=f;renderAll()};
+window.fSp=(f)=>{C._sf=f;renderAll()};
+window.fTal=(f)=>{C._tf=f;renderAll()};
 window.pickBg=(id)=>{C.background=id;renderAll()};
-window.chAttr=(id,d)=>{
-  const v=C.attrs[id], nv=Math.max(-2,Math.min(3,v+d));
-  if(d>0&&attrLeft()<=0)return;
-  C.attrs[id]=nv; renderAll();
+window.setLv=(n)=>{C.level=n;renderAll()};
+window.chA=(id,d)=>{
+  const v=C.attrs[id],cap=getAttrCap(C.level),left=getAttrLeft();
+  if(d>0&&(v>=cap||left<=0))return;
+  C.attrs[id]=Math.max(-2,Math.min(cap,v+d));renderAll();
 };
-window.chSkill=(id,d)=>{
-  const v=C.skills[id]||0, lSP=totalSP()-spentSP();
-  if(d>0&&lSP<=0)return;
-  C.skills[id]=Math.max(0,Math.min(1,v+d)); renderAll();
+window.chSK=(id,d)=>{
+  const v=C.skills[id]||0,max=maxSkillLvl(),left=getSkLeft();
+  if(d>0&&(v>=max||left<=0))return;
+  C.skills[id]=Math.max(0,Math.min(max,v+d));renderAll();
 };
-window.chTrade=(id,d)=>{
-  const v=C.trades[id]||0, lTP=3-spentTP();
-  if(d>0&&lTP<=0)return;
-  C.trades[id]=Math.max(0,Math.min(1,v+d)); renderAll();
+window.chTR=(id,d)=>{
+  const v=C.trades[id]||0,max=maxSkillLvl(),left=getTrLeft();
+  if(d>0&&(v>=max||left<=0))return;
+  C.trades[id]=Math.max(0,Math.min(max,v+d));renderAll();
 };
-window.toggleEq=(id)=>{
-  const i=C.equipment.indexOf(id);
-  if(i>=0)C.equipment.splice(i,1);else C.equipment.push(id);
-  const el=document.getElementById('eq-'+id);
-  if(el)el.checked=C.equipment.includes(id);
+window.togEQ=(id)=>{
+  const i=C.equipment.indexOf(id);if(i>=0)C.equipment.splice(i,1);else C.equipment.push(id);
+  const el=document.getElementById('eq-'+id);if(el)el.checked=C.equipment.includes(id);
 };
-window.toggleSpell=(id,max)=>{
-  const i=C.spells.indexOf(id);
-  if(i>=0)C.spells.splice(i,1);else if(C.spells.length<max)C.spells.push(id);
+window.togSp=(id,max)=>{
+  const i=C.spells.indexOf(id);if(i>=0)C.spells.splice(i,1);else if(C.spells.length<max)C.spells.push(id);
   renderAll();
 };
-window.toggleMan=(id,max)=>{
-  const i=C.maneuvers.indexOf(id);
-  if(i>=0)C.maneuvers.splice(i,1);else if(C.maneuvers.length<max)C.maneuvers.push(id);
+window.togMn=(id,max)=>{
+  const i=C.maneuvers.indexOf(id);if(i>=0)C.maneuvers.splice(i,1);else if(C.maneuvers.length<max)C.maneuvers.push(id);
   renderAll();
 };
-window.toggleTalent=(id)=>{
-  const i=C.talents.indexOf(id);
-  if(i>=0)C.talents.splice(i,1);else if(C.talents.length<1)C.talents.push(id);
+window.togTal=(id,max)=>{
+  const i=C.talents.indexOf(id);if(i>=0)C.talents.splice(i,1);else if(C.talents.length<max)C.talents.push(id);
   renderAll();
 };
-window.switchSkillTab=(t)=>{C._skillTab=t;renderAll()};
-window.switchEqTab=(t)=>{C._eqTab=t;renderAll()};
+window.swSK=(t)=>{C._skt=t;renderAll()};
+window.swEQ=(t)=>{C._eqt=t;renderAll()};
 
-function toast(msg){
-  const el=document.getElementById('toast');
-  el.textContent=msg;el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'),2500);
-}
-
-window.downloadChar=()=>{
-  const cl=getCls();
-  const a1=ANCESTRIES.find(a=>a.id===C.ancestry1);
-  const a2=ANCESTRIES.find(a=>a.id===C.ancestry2);
-  const bg=BACKGROUNDS.find(b=>b.id===C.background);
-  const sc=cl&&cl.subclasses.find(s=>s.id===C.subclassId);
-  const data={
-    system:"DC20 Beta 0.10",
-    name:C.name||"Unnamed",
-    pronouns:C.pronouns,
-    concept:C.concept,
-    level:1,
-    ancestry:{primary:a1?a1.name:null,secondary:a2?a2.name:null},
-    class:{name:cl?cl.name:null,type:cl?cl.type:null,subclass:sc?sc.name:null},
-    background:bg?bg.name:null,
-    attributes:C.attrs,
-    stats:{hp:calcHP(),pd:calcPD(),ad:calcAD(),saveDC:14,attackCheck:"+4",primeMod:pm(),gritPoints:Math.max(0,2+C.attrs.charisma),sp:cl?cl.sp:0,mp:cl?cl.mp:0,restPoints:calcHP()},
+// ── JSON Export ─────────────────────────────────────────
+window.dlJSON=()=>{
+  const cl=getCls(),a1=ANCESTRIES.find(a=>a.id===C.ancestry1),a2=ANCESTRIES.find(a=>a.id===C.ancestry2);
+  const bg=BACKGROUNDS.find(b=>b.id===C.background),sc=cl&&cl.subclasses.find(s=>s.id===C.subclassId);
+  const data={system:"DC20 Beta 0.10",name:C.name||"Unnamed",pronouns:C.pronouns,concept:C.concept,level:C.level,
+    ancestry:{primary:a1?.name||null,secondary:a2?.name||null},
+    class:{name:cl?.name||null,type:cl?.type||null,subclass:sc?.name||null},
+    background:bg?.name||null,attributes:C.attrs,
+    stats:{hp:calcHP(),pd:calcPD(),ad:calcAD(),saveDC:calcDC(),attackCheck:calcAtk(),combatMastery:calcCM(),primeMod:pm(),gritPoints:calcGrit(),sp:calcSP(),mp:calcMP(),restPoints:calcHP()},
     skills:Object.fromEntries(Object.entries(C.skills).filter(([,v])=>v>0).map(([k,v])=>[SKILLS.find(s=>s.id===k)?.name||k,v])),
     trades:Object.fromEntries(Object.entries(C.trades).filter(([,v])=>v>0).map(([k,v])=>[TRADES.find(t=>t.id===k)?.name||k,v])),
     equipment:C.equipment.map(id=>EQUIPMENT.find(e=>e.id===id)?.name||id),
     spells:C.spells.map(id=>SPELLS.find(s=>s.id===id)?.name||id),
     maneuvers:C.maneuvers.map(id=>MANEUVERS.find(m=>m.id===id)?.name||id),
-    talents:C.talents.map(id=>TALENTS.find(t=>t.id===id)?.name||id)
-  };
+    talents:C.talents.map(id=>TALENTS.find(t=>t.id===id)?.name||id)};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
   a.href=url;a.download=`${(C.name||'character').replace(/\s+/g,'_')}_dc20.json`;a.click();
-  URL.revokeObjectURL(url);
-  toast('Character JSON downloaded!');
+  URL.revokeObjectURL(url);toast('JSON exported!');
 };
 
-window.downloadHTML=()=>{
-  const cl=getCls();
-  const a1=ANCESTRIES.find(a=>a.id===C.ancestry1);
-  const a2=ANCESTRIES.find(a=>a.id===C.ancestry2);
-  const bg=BACKGROUNDS.find(b=>b.id===C.background);
-  const sc=cl&&cl.subclasses.find(s=>s.id===C.subclassId);
-  const hp=calcHP(),pd=calcPD(),ad=calcAD(),pm_=pm();
-  const sp_=cl?cl.sp:0,mp_=cl?cl.mp:0;
-  const grit=Math.max(0,2+C.attrs.charisma);
-  const jump=Math.max(1,C.attrs.agility);
+// ── DC20-Styled HTML Sheet Export ─────────────────────────────────────────
+window.dlSheet=()=>{
+  const cl=getCls(),a1=ANCESTRIES.find(a=>a.id===C.ancestry1),a2=ANCESTRIES.find(a=>a.id===C.ancestry2);
+  const bg=BACKGROUNDS.find(b=>b.id===C.background),sc=cl&&cl.subclasses.find(s=>s.id===C.subclassId);
+  const hp=calcHP(),pd=calcPD(),ad=calcAD(),cm=calcCM(),dc=calcDC(),atk=calcAtk(),grit=calcGrit(),jump=calcJump();
+  const sp=calcSP(),mp=calcMP();
+  const skList=Object.keys(C.skills).filter(k=>C.skills[k]>0).map(k=>({name:SKILLS.find(s=>s.id===k)?.name||k,lv:C.skills[k],attr:SKILLS.find(s=>s.id===k)?.attr||''}));
+  const trList=Object.keys(C.trades).filter(k=>C.trades[k]>0).map(k=>({name:TRADES.find(t=>t.id===k)?.name||k}));
+  const skCap=getLvRow(C.level).skCap;
+  const skBonus=getLvRow(C.level).skCap==="Novice"?2:getLvRow(C.level).skCap==="Adept"?4:6;
+  const attrSave=a=>C.attrs[a]>=0?'+':''+String(C.attrs[a]+cm);
+  const attrVal=a=>C.attrs[a]>=0?'+'+C.attrs[a]:String(C.attrs[a]);
 
-  const spellRows=C.spells.map(id=>{const s=SPELLS.find(x=>x.id===id);return s?`<tr><td><strong>${s.name}</strong></td><td>${s.school}</td><td>${s.cost}</td><td>${s.range}</td></tr>`:''}).join('');
-  const manRows=C.maneuvers.map(id=>{const m=MANEUVERS.find(x=>x.id===id);return m?`<tr><td><strong>${m.name}</strong></td><td>${m.type}</td><td>${m.cost}</td><td>${m.desc.substring(0,60)}…</td></tr>`:''}).join('');
-  const talentRows=C.talents.map(id=>{const t=TALENTS.find(x=>x.id===id);return t?`<tr><td><strong>${t.name}</strong></td><td>${t.type}</td><td>${t.desc}</td></tr>`:''}).join('');
-  const eqRows=C.equipment.map(id=>{const e=EQUIPMENT.find(x=>x.id===id);return e?`<tr><td><strong>${e.name}</strong></td><td>${e.type}</td><td>${e.desc}</td></tr>`:''}).join('');
-  const skillList=Object.keys(C.skills).filter(k=>C.skills[k]>0).map(k=>SKILLS.find(s=>s.id===k)?.name||k).join(', ');
-  const tradeList=Object.keys(C.trades).filter(k=>C.trades[k]>0).map(k=>TRADES.find(t=>t.id===k)?.name||k).join(', ');
+  const spellRows=C.spells.map(id=>{const s=SPELLS.find(x=>x.id===id);return s?`
+  <tr>
+    <td class="sp-name">${s.name}</td>
+    <td>${s.school}</td>
+    <td>${s.src}</td>
+    <td>${s.cost}</td>
+    <td>${s.range}</td>
+    <td class="sp-desc">${s.desc}</td>
+  </tr>`:''}).join('');
 
-  const html=`<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>${C.name||'Character'} — DC20 Sheet</title>
+  const manRows=C.maneuvers.map(id=>{const m=MANEUVERS.find(x=>x.id===id);return m?`
+  <tr>
+    <td class="sp-name">${m.name}</td>
+    <td>${m.type}</td>
+    <td>${m.cost}</td>
+    <td class="sp-desc">${m.desc}</td>
+  </tr>`:''}).join('');
+
+  const talentRows=C.talents.map(id=>{const t=TALENTS.find(x=>x.id===id);return t?`
+  <tr>
+    <td class="sp-name">${t.name}</td>
+    <td>${t.type}</td>
+    <td class="sp-desc">${t.desc}</td>
+  </tr>`:''}).join('');
+
+  const eqRows=C.equipment.map(id=>{const e=EQUIPMENT.find(x=>x.id===id);return e?`
+  <tr>
+    <td class="sp-name">${e.name}</td>
+    <td>${e.type}</td>
+    <td class="sp-desc">${e.desc}</td>
+  </tr>`:''}).join('');
+
+  function box(label,val,sub=''){
+    return `<div class="stat-box"><div class="box-lbl">${label}</div><div class="box-val">${val}</div>${sub?`<div class="box-sub">${sub}</div>`:''}</div>`;
+  }
+  function attrBox(name,id){
+    return `<div class="attr-box">
+      <div class="ab-name">${name}</div>
+      <div class="ab-val">${attrVal(id)}</div>
+      <div class="ab-save">Save: ${attrSave(id)}</div>
+    </div>`;
+  }
+
+  const html=`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(C.name)||'Character'} — DC20 Character Sheet</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f5f5f0;color:#1a1a1a;padding:2rem}
-.page{max-width:800px;margin:0 auto;background:#fff;border:1px solid #ccc;border-radius:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,0.08)}
-.hero{background:linear-gradient(135deg,#1a2a4a,#2a4a6a);color:#fff;padding:2rem;position:relative}
-.hero h1{font-size:28px;font-weight:700;margin-bottom:4px}
-.hero .meta{font-size:14px;opacity:0.8;margin-bottom:4px}
-.hero .concept{font-size:13px;opacity:0.65;font-style:italic;margin-top:8px}
-.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:12px;margin-left:6px;font-weight:600}
-.b-m{background:rgba(255,255,255,0.15);color:#fff}
-.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:#f0f0e8}
-.stat{padding:16px;text-align:center;border-right:1px solid #ddd;border-bottom:1px solid #ddd}
-.stat:nth-child(4n){border-right:none}
-.stat-n{font-size:10px;text-transform:uppercase;letter-spacing:0.5px;color:#666;font-weight:700;margin-bottom:4px}
-.stat-v{font-size:26px;font-weight:800;color:#1a2a4a}
-.stat-s{font-size:10px;color:#999;margin-top:2px}
-.section{padding:1.25rem 1.5rem;border-bottom:1px solid #eee}
-.section h2{font-size:12px;text-transform:uppercase;letter-spacing:0.7px;color:#666;font-weight:700;margin-bottom:10px}
-.attr-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
-.attr-box{background:#f5f5f0;border-radius:8px;padding:10px;text-align:center}
-.attr-box .n{font-size:11px;color:#666;font-weight:600;text-transform:uppercase;margin-bottom:2px}
-.attr-box .v{font-size:20px;font-weight:800;color:#1a2a4a}
-table{width:100%;border-collapse:collapse;font-size:13px}
-th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.4px;color:#666;padding:6px 8px;border-bottom:2px solid #ddd;font-weight:700}
-td{padding:6px 8px;border-bottom:1px solid #eee;vertical-align:top}
-tr:last-child td{border-bottom:none}
-.tags{display:flex;flex-wrap:wrap;gap:4px}
-.tag{font-size:11px;padding:2px 7px;border-radius:10px;background:#eee;color:#555}
-.footer{text-align:center;font-size:11px;color:#999;padding:1rem;background:#f9f9f5}
-@media print{body{background:#fff;padding:0}.page{box-shadow:none;border:none}}
-@media(max-width:600px){.stats-grid{grid-template-columns:1fr 1fr}.attr-grid{grid-template-columns:1fr 1fr}}
-</style></head><body>
+@page{margin:15mm}
+body{font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;background:#f0ede6;color:#1a1a18;font-size:13px}
+.page{max-width:900px;margin:0 auto;background:#fff;min-height:100vh}
+
+/* ── Header Banner ── */
+.banner{background:linear-gradient(135deg,#3a1f6b 0%,#5c3d8f 50%,#1a0f38 100%);color:#fff;padding:0}
+.banner-inner{display:grid;grid-template-columns:auto 1fr;align-items:stretch}
+.banner-left{padding:1.5rem;border-right:2px solid rgba(255,255,255,0.15);min-width:160px;display:flex;flex-direction:column;justify-content:center}
+.banner-logo{font-size:36px;font-weight:900;letter-spacing:-1px;color:#fff;line-height:1}
+.banner-logo span{color:#c9a84c}
+.banner-sub{font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:.6;margin-top:4px}
+.banner-right{padding:1.5rem 1.75rem;flex:1}
+.char-name{font-size:28px;font-weight:800;letter-spacing:.3px;margin-bottom:4px}
+.char-meta{font-size:13px;opacity:.8;margin-bottom:2px}
+.char-tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.ctag{font-size:10px;padding:3px 10px;border-radius:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px}
+.ctag-class{background:rgba(201,168,76,0.25);color:#f0d080;border:1px solid rgba(201,168,76,0.4)}
+.ctag-type{background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.8);border:1px solid rgba(255,255,255,0.2)}
+.concept-text{font-size:12px;opacity:.6;font-style:italic;margin-top:8px;line-height:1.5;max-width:480px}
+
+/* ── Section labels ── */
+.section{padding:1rem 1.5rem;border-bottom:0.5px solid #e0ddd5}
+.section-title{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:#5c3d8f;border-bottom:2px solid #5c3d8f;padding-bottom:5px;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+.section-title::before{content:'';display:inline-block;width:4px;height:14px;background:#c9a84c;border-radius:2px;flex-shrink:0}
+
+/* ── Combat stats grid ── */
+.stats-row{display:grid;grid-template-columns:repeat(6,1fr);gap:0;border:1.5px solid #3a1f6b;border-radius:8px;overflow:hidden}
+.stat-box{padding:10px 6px;text-align:center;border-right:0.5px solid #c8c4b8;position:relative}
+.stat-box:last-child{border-right:none}
+.box-lbl{font-size:9px;text-transform:uppercase;letter-spacing:.5px;color:#888;font-weight:700;margin-bottom:4px;line-height:1.2}
+.box-val{font-size:22px;font-weight:900;color:#3a1f6b;line-height:1}
+.box-sub{font-size:9px;color:#aaa;margin-top:3px}
+.stat-box.highlight .box-val{color:#c0392b}
+.stat-box.highlight .box-lbl{color:#c0392b}
+
+/* ── Secondary stats ── */
+.sec-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}
+.sec-box{background:#f5f3ee;border:0.5px solid #d8d5cc;border-radius:6px;padding:8px;text-align:center}
+.sec-box .box-lbl{font-size:9px}
+.sec-box .box-val{font-size:18px;font-weight:800;color:#1a1a18}
+
+/* ── Attributes ── */
+.attrs-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.attr-box{background:#3a1f6b;border-radius:8px;padding:10px;text-align:center;color:#fff}
+.ab-name{font-size:9px;text-transform:uppercase;letter-spacing:.8px;opacity:.7;font-weight:700;margin-bottom:6px}
+.ab-val{font-size:26px;font-weight:900;line-height:1}
+.ab-save{font-size:10px;opacity:.65;margin-top:4px;padding-top:4px;border-top:1px solid rgba(255,255,255,0.2)}
+
+/* ── Skills ── */
+.skills-grid{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+.skill-row{display:flex;align-items:center;gap:8px;padding:5px 8px;background:#f9f7f3;border-radius:5px;border:0.5px solid #e5e2d8}
+.sk-name{flex:1;font-size:12px;font-weight:600}
+.sk-attr{font-size:10px;color:#999;width:65px}
+.sk-dots{display:flex;gap:3px}
+.sk-dot{width:9px;height:9px;border-radius:50%;border:1.5px solid #3a1f6b}
+.sk-dot.fill{background:#3a1f6b}
+.sk-bonus{font-size:12px;font-weight:800;color:#3a1f6b;width:30px;text-align:right}
+
+/* ── Tables ── */
+table.dc20{width:100%;border-collapse:collapse;font-size:12px}
+table.dc20 thead tr{background:#3a1f6b;color:#fff}
+table.dc20 th{padding:7px 10px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+table.dc20 td{padding:7px 10px;border-bottom:0.5px solid #eae7e0;vertical-align:top}
+table.dc20 tr:last-child td{border-bottom:none}
+table.dc20 tr:nth-child(even) td{background:#faf8f4}
+.sp-name{font-weight:700}
+.sp-desc{color:#555;font-size:11px}
+
+/* ── Two column layout ── */
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:0}
+.two-col .section{border-right:0.5px solid #e0ddd5}
+.two-col .section:last-child{border-right:none}
+
+/* ── Footer ── */
+.footer{background:#3a1f6b;color:rgba(255,255,255,0.5);text-align:center;font-size:10px;padding:10px;letter-spacing:.3px}
+.footer span{color:rgba(255,255,255,0.8)}
+
+/* ── Death's Door bubble ── */
+.death-bubble{display:inline-block;background:#c0392b;color:#fff;border-radius:50%;width:38px;height:38px;line-height:38px;font-size:16px;font-weight:900;text-align:center}
+
+/* Print */
+@media print{body{background:#fff}.page{box-shadow:none}}
+@media(max-width:600px){
+  .stats-row{grid-template-columns:repeat(3,1fr)}
+  .stat-box{border-bottom:0.5px solid #c8c4b8}
+  .attrs-grid{grid-template-columns:1fr 1fr}
+  .skills-grid{grid-template-columns:1fr}
+  .two-col{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
 <div class="page">
-<div class="hero">
-  <h1>${esc(C.name||'Unnamed Hero')}</h1>
-  <div class="meta">${a1?a1.name:'—'}${a2?' / '+a2.name:''} <span class="badge b-m">${cl?cl.name:'—'}</span>${sc?` <span class="badge b-m">${sc.name}</span>`:''} · Level 1</div>
-  <div class="meta">${bg?bg.name:'—'}${C.pronouns?' · '+C.pronouns:''}</div>
-  ${C.concept?`<div class="concept">"${esc(C.concept.substring(0,200))}${C.concept.length>200?'…':''}"</div>`:''}
+
+<!-- BANNER -->
+<div class="banner">
+<div class="banner-inner">
+<div class="banner-left">
+  <div class="banner-logo">DC<span>20</span></div>
+  <div class="banner-sub">Beta 0.10</div>
+  <div style="margin-top:12px;font-size:10px;opacity:.55">Character Sheet</div>
 </div>
-<div class="stats-grid">
-  <div class="stat"><div class="stat-n">Max HP</div><div class="stat-v">${hp}</div><div class="stat-s">Class + Might</div></div>
-  <div class="stat"><div class="stat-n">Precision Defense</div><div class="stat-v">${pd}</div><div class="stat-s">8+CM+Agi+Int</div></div>
-  <div class="stat"><div class="stat-n">Area Defense</div><div class="stat-v">${ad}</div><div class="stat-s">8+CM+Mgt+Cha</div></div>
-  <div class="stat"><div class="stat-n">Save DC</div><div class="stat-v">14</div><div class="stat-s">10+CM+Prime</div></div>
-  <div class="stat"><div class="stat-n">Prime Modifier</div><div class="stat-v">${pm_>=0?'+'+pm_:pm_}</div><div class="stat-s">Highest attr</div></div>
-  <div class="stat"><div class="stat-n">Attack Check</div><div class="stat-v">+4</div><div class="stat-s">CM + Prime</div></div>
-  <div class="stat"><div class="stat-n">Grit Points</div><div class="stat-v">${grit}</div><div class="stat-s">2 + Charisma</div></div>
-  <div class="stat"><div class="stat-n">SP / MP</div><div class="stat-v">${sp_}/${mp_}</div><div class="stat-s">Stamina/Mana</div></div>
-  <div class="stat"><div class="stat-n">Move Speed</div><div class="stat-v">5</div><div class="stat-s">Spaces</div></div>
-  <div class="stat"><div class="stat-n">Jump Distance</div><div class="stat-v">${jump}</div><div class="stat-s">Spaces</div></div>
-  <div class="stat"><div class="stat-n">Rest Points</div><div class="stat-v">${hp}</div><div class="stat-s">= Max HP</div></div>
-  <div class="stat"><div class="stat-n">Death's Door</div><div class="stat-v">−${pm_>=0?pm_:Math.abs(pm_)}</div><div class="stat-s">= Prime Mod</div></div>
+<div class="banner-right">
+  <div class="char-name">${esc(C.name)||'Unnamed Hero'}</div>
+  <div class="char-meta">${a1?a1.name:'—'}${a2?' / '+a2.name:''} · Level ${C.level}</div>
+  <div class="char-meta">${bg?bg.name:'—'}${C.pronouns?' · '+esc(C.pronouns):''}</div>
+  <div class="char-tags">
+    ${cl?`<span class="ctag ctag-class">${cl.name}</span>`:'' }
+    ${cl?`<span class="ctag ctag-type">${cl.type}</span>`:''}
+    ${sc?`<span class="ctag ctag-type">${sc.name}</span>`:''}
+    <span class="ctag ctag-type">CM +${cm}</span>
+  </div>
+  ${C.concept?`<div class="concept-text">"${esc(C.concept.substring(0,160))}${C.concept.length>160?'…':''}"</div>`:''}
 </div>
+</div>
+</div>
+
+<!-- CORE COMBAT STATS -->
 <div class="section">
-  <h2>Attributes &amp; Saves</h2>
-  <div class="attr-grid">
-  ${ATTRIBUTES.map(a=>`<div class="attr-box"><div class="n">${a.name}</div><div class="v">${C.attrs[a.id]>=0?'+'+C.attrs[a.id]:C.attrs[a.id]}</div></div>`).join('')}
+<div class="section-title">Combat Statistics</div>
+<div class="stats-row">
+  ${box('Max HP',hp,'Class + Might')}
+  ${box('Prec. Defense',pd,'8+CM+Agi+Int')}
+  ${box('Area Defense',ad,'8+CM+Mgt+Cha')}
+  ${box('Save DC',dc,'10+CM+Prime')}
+  ${box('Atk / Spell',atk,'CM + Prime')}
+  ${box('Prime Mod',pm()>=0?'+'+pm():pm(),'Highest attr')}
+</div>
+<div class="sec-stats">
+  ${box('Grit Points',grit,'2 + Charisma')}
+  ${box('SP / MP',`${sp} / ${mp}`,'Stamina / Mana')}
+  ${box('Move Speed','5','Spaces')}
+  ${box('Rest Points',hp,'= Max HP')}
+</div>
+<div style="display:flex;align-items:center;gap:16px;margin-top:10px;padding:8px 12px;background:#fff3f3;border-radius:6px;border:1px solid #f5c5c5">
+  <span class="death-bubble">−${Math.abs(pm())}</span>
+  <div>
+    <div style="font-size:11px;font-weight:700;color:#c0392b;text-transform:uppercase;letter-spacing:.5px">Death's Door</div>
+    <div style="font-size:11px;color:#888;margin-top:2px">When HP reaches −${Math.abs(pm())} (= Prime Modifier), the character dies.</div>
+  </div>
+  <div style="margin-left:auto;font-size:11px;color:#888">
+    Jump: <strong>${jump} Spaces</strong><br>Combat Mastery: <strong>+${cm}</strong>
   </div>
 </div>
-${skillList||tradeList?`<div class="section">
-  <h2>Skills &amp; Trades</h2>
-  ${skillList?`<div style="margin-bottom:6px"><strong style="font-size:12px">Skills (Novice):</strong> ${skillList}</div>`:''}
-  ${tradeList?`<div><strong style="font-size:12px">Trades (Novice):</strong> ${tradeList}</div>`:''}
+</div>
+
+<!-- ATTRIBUTES -->
+<div class="section">
+<div class="section-title">Attributes & Saves</div>
+<div class="attrs-grid">
+  ${attrBox('Might','might')}
+  ${attrBox('Agility','agility')}
+  ${attrBox('Charisma','charisma')}
+  ${attrBox('Intelligence','intelligence')}
+</div>
+<div style="font-size:11px;color:#888;margin-top:8px">Attribute Cap: +${getAttrCap(C.level)} at Level ${C.level} · Skill Mastery Cap: ${skCap} (+${skBonus})</div>
+</div>
+
+<!-- SKILLS & TRADES -->
+${skList.length||trList.length?`<div class="two-col">
+${skList.length?`<div class="section">
+<div class="section-title">Skills (${skCap} — +${skBonus})</div>
+<div class="skills-grid">
+${skList.map(sk=>`<div class="skill-row">
+<div class="sk-name">${sk.name}</div>
+<div class="sk-attr">${sk.attr}</div>
+<div class="sk-dots">${[...Array(3)].map((_,i)=>`<div class="sk-dot ${sk.lv>i?'fill':''}"></div>`).join('')}</div>
+<div class="sk-bonus">+${sk.lv*2}</div>
+</div>`).join('')}
+</div></div>`:'<div></div>'}
+${trList.length?`<div class="section">
+<div class="section-title">Trades</div>
+${trList.map(tr=>`<div class="skill-row"><div class="sk-name">${tr.name}</div></div>`).join('')}
+</div>`:'<div></div>'}
 </div>`:''}
-${eqRows?`<div class="section"><h2>Equipment</h2><table><thead><tr><th>Item</th><th>Type</th><th>Properties</th></tr></thead><tbody>${eqRows}</tbody></table></div>`:''}
-${spellRows?`<div class="section"><h2>Spells Known</h2><table><thead><tr><th>Spell</th><th>School</th><th>Cost</th><th>Range</th></tr></thead><tbody>${spellRows}</tbody></table></div>`:''}
-${manRows?`<div class="section"><h2>Maneuvers Known</h2><table><thead><tr><th>Maneuver</th><th>Type</th><th>Cost</th><th>Effect</th></tr></thead><tbody>${manRows}</tbody></table></div>`:''}
-${talentRows?`<div class="section"><h2>Talents</h2><table><thead><tr><th>Talent</th><th>Type</th><th>Description</th></tr></thead><tbody>${talentRows}</tbody></table></div>`:''}
-<div class="footer">DC20 Beta 0.10 by The Dungeon Coach · Character created with DC20 Character Creator · ${new Date().toLocaleDateString()}</div>
-</div></body></html>`;
+
+<!-- EQUIPMENT -->
+${eqRows?`<div class="section">
+<div class="section-title">Equipment</div>
+<table class="dc20">
+<thead><tr><th>Item</th><th>Type</th><th>Properties</th></tr></thead>
+<tbody>${eqRows}</tbody>
+</table></div>`:''}
+
+<!-- SPELLS -->
+${spellRows?`<div class="section">
+<div class="section-title">Spells Known</div>
+<table class="dc20">
+<thead><tr><th>Spell</th><th>School</th><th>Source</th><th>Cost</th><th>Range</th><th>Description</th></tr></thead>
+<tbody>${spellRows}</tbody>
+</table></div>`:''}
+
+<!-- MANEUVERS -->
+${manRows?`<div class="section">
+<div class="section-title">Maneuvers Known</div>
+<table class="dc20">
+<thead><tr><th>Maneuver</th><th>Type</th><th>Cost</th><th>Description</th></tr></thead>
+<tbody>${manRows}</tbody>
+</table></div>`:''}
+
+<!-- TALENTS -->
+${talentRows?`<div class="section">
+<div class="section-title">Talents</div>
+<table class="dc20">
+<thead><tr><th>Talent</th><th>Type</th><th>Description</th></tr></thead>
+<tbody>${talentRows}</tbody>
+</table></div>`:''}
+
+<!-- ANCESTRY & CLASS NOTES -->
+<div class="two-col">
+<div class="section">
+<div class="section-title">Ancestry</div>
+<div style="font-size:13px;font-weight:700;margin-bottom:4px">${a1?a1.name:'—'}${a2?' / '+a2.name:''}</div>
+${a1?`<div style="font-size:11px;color:#666;margin-bottom:6px">${a1.traits}</div>`:''}
+${a2?`<div style="font-size:11px;color:#666">${a2.traits}</div>`:''}
+<div style="margin-top:10px;font-size:11px;color:#999">Ancestry Points: 5 base +${C.level>=7?4:C.level>=4?2:0} from levels</div>
+</div>
+<div class="section">
+<div class="section-title">Class & Subclass</div>
+<div style="font-size:13px;font-weight:700;margin-bottom:4px">${cl?cl.name:'—'}</div>
+${cl?`<div style="font-size:11px;color:#666;margin-bottom:6px">${cl.desc}</div>`:''}
+${sc?`<div style="font-size:12px;font-weight:700;color:#5c3d8f;margin-bottom:3px">${sc.name}${sc.paragon?' <span style="font-size:10px;background:#FAECE7;color:#993C1D;padding:1px 5px;border-radius:3px;font-weight:700">Paragon</span>':''}</div>`:''}
+${sc?`<div style="font-size:11px;color:#666">${sc.desc}</div>`:''}
+</div>
+</div>
+
+<!-- NOTES AREA -->
+<div class="section">
+<div class="section-title">Notes</div>
+<div style="min-height:80px;border:0.5px dashed #ccc;border-radius:6px;padding:10px;font-size:12px;color:#ccc">
+${C.concept?esc(C.concept):'Use this space for additional notes, backstory, or in-game details…'}
+</div>
+</div>
+
+<div class="footer">DC20 Beta 0.10 by <span>The Dungeon Coach</span> · Generated ${new Date().toLocaleDateString()} · Unofficial fan tool</div>
+</div>
+</body>
+</html>`;
 
   const blob=new Blob([html],{type:'text/html'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');
   a.href=url;a.download=`${(C.name||'character').replace(/\s+/g,'_')}_dc20_sheet.html`;a.click();
-  URL.revokeObjectURL(url);
-  toast('HTML character sheet downloaded!');
+  URL.revokeObjectURL(url);toast('DC20 character sheet exported!');
 };
 
 renderAll();
