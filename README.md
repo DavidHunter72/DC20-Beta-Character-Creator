@@ -29,11 +29,11 @@ open dc20-character-creator.html
 ```
 Or just double-click the file. It works in Chrome, Firefox, Safari, and Edge.
 
-### GitHub Pages
+### GitHub Pagesr
 1. Fork this repository
 2. Go to **Settings → Pages**
 3. Set source to `main` branch, root folder
-4. Your creator will be live at `https://yourusername.github.io/dc20-character-creator/`
+4. Your creator will be live at `https://davidahunter72.github.io/dc20-character-creator/`
 
 ### Hosting anywhere
 Upload `dc20-character-creator.html` to any static host — Netlify, Vercel, Cloudflare Pages, GitHub Pages, etc.
